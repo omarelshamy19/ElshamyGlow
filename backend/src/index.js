@@ -28,6 +28,9 @@ app.get('/api/health', (req, res) => {
 
 await initDb();
 seedData();
+
+export default app;
+
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
