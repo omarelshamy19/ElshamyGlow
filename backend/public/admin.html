@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>لوحة التحكم - GlowRX</title>
+<style>
+:root{--primary:#8B2F8E;--primary-light:#b35cb6;--bg:#f8f4ff;--card:#fff;--text:#333;--border:#e8e0f0;--success:#28a745;--warning:#ffc107;--danger:#dc3545;--info:#17a2b8}
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',system-ui,sans-serif}
+body{background:var(--bg);color:var(--text);display:flex;min-height:100vh}
+.sidebar{width:240px;background:linear-gradient(180deg,#6B2F8E,#8B2F8E);color:#fff;padding:20px;display:flex;flex-direction:column;position:fixed;height:100vh;z-index:100}
+.sidebar h2{font-size:20px;margin-bottom:30px;text-align:center}
+.sidebar a{padding:12px 15px;margin:4px 0;border-radius:10px;color:rgba(255,255,255,.8);text-decoration:none;cursor:pointer;display:block;transition:.2s}
+.sidebar a:hover,.sidebar a.active{background:rgba(255,255,255,.2);color:#fff}
+.main{margin-right:240px;flex:1;padding:25px;width:calc(100% - 240px)}
+.header{display:flex;justify-content:space-between;align-items:center;margin-bottom:25px;flex-wrap:wrap;gap:10px}
+.header h1{font-size:24px}
+.card{background:var(--card);border-radius:12px;padding:20px;box-shadow:0 2px 8px rgba(0,0,0,.08);margin-bottom:20px}
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;margin-bottom:25px}
+.stat-card{background:var(--card);border-radius:12px;padding:20px;box-shadow:0 2px 8px rgba(0,0,0,.08);text-align:center}
+.stat-card .num{font-size:32px;font-weight:700;color:var(--primary);margin:8px 0}
+.stat-card .label{color:#888;font-size:14px}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{padding:10px 12px;text-align:right;border-bottom:1px solid var(--border)}
+th{background:var(--bg);font-weight:600;color:var(--primary)}
+tr:hover{background:#faf5ff}
+.badge{padding:3px 10px;border-radius:20px;font-size:12px;font-weight:600}
+.badge.pending{background:#fff3cd;color:#856404}
+.badge.confirmed{background:#cce5ff;color:#004085}
+.badge.shipped{background:#d4edda;color:#155724}
+.badge.delivered{background:#d4edda;color:#155724}
+.badge.cancelled{background:#f8d7da;color:#721c24}
+.btn{padding:8px 16px;border:none;border-radius:8px;cursor:pointer;font-size:14px;transition:.2s}
+.btn-primary{background:var(--primary);color:#fff}
+.btn-primary:hover{background:var(--primary-light)}
+.btn-success{background:var(--success);color:#fff}
+.btn-danger{background:var(--danger);color:#fff}
+.btn-sm{padding:4px 10px;font-size:12px}
+.btn-outline{border:1px solid var(--border);background:transparent;cursor:pointer;padding:4px 10px;border-radius:6px;font-size:12px}
+select.status-select{padding:4px 8px;border:1px solid var(--border);border-radius:6px;font-size:12px}
+.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:1000;justify-content:center;align-items:center}
+.modal.show{display:flex}
+.modal-content{background:var(--card);border-radius:16px;padding:30px;width:90%;max-width:600px;max-height:85vh;overflow-y:auto}
+.modal-content h3{margin-bottom:20px;color:var(--primary)}
+.form-group{margin-bottom:15px}
+.form-group label{display:block;margin-bottom:5px;font-weight:600;font-size:14px;color:#555}
+.form-group input,.form-group select,.form-group textarea{width:100%;padding:10px;border:1px solid var(--border);border-radius:8px;font-size:14px}
+.form-group textarea{resize:vertical;height:80px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:15px}
+.tabs{display:flex;gap:5px;margin-bottom:20px;flex-wrap:wrap}
+.tabs button{padding:8px 18px;border:1px solid var(--border);border-radius:8px;background:var(--card);cursor:pointer;font-size:14px;transition:.2s}
+.tabs button:hover{background:var(--bg)}
+.tabs button.active{background:var(--primary);color:#fff;border-color:var(--primary)}
+.search-bar{display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap}
+.search-bar input{padding:8px 15px;border:1px solid var(--border);border-radius:8px;flex:1;min-width:200px;font-size:14px}
+.pagination{display:flex;justify-content:center;gap:8px;margin-top:20px;align-items:center}
+.pagination button{padding:6px 14px;border:1px solid var(--border);border-radius:6px;background:var(--card);cursor:pointer}
+.pagination button:disabled{opacity:.5;cursor:default}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);padding:12px 24px;border-radius:10px;color:#fff;z-index:9999;display:none;animation:fadeIn .3s}
+.toast.show{display:block}
+.toast.success{background:var(--success)}
+.toast.error{background:var(--danger)}
+@keyframes fadeIn{from{opacity:0;transform:translateX(-50%) translateY(20px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+.login-page{display:flex;justify-content:center;align-items:center;min-height:100vh;background:linear-gradient(135deg,#6B2F8E,#8B2F8E);width:100%;margin:0;padding:0}
+.login-card{background:#fff;border-radius:16px;padding:40px;width:90%;max-width:400px;box-shadow:0 10px 40px rgba(0,0,0,.2)}
+.login-card h2{text-align:center;color:var(--primary);margin-bottom:25px}
+.login-card .form-group{margin-bottom:18px}
+.login-card input{width:100%;padding:12px;border:1px solid var(--border);border-radius:10px;font-size:15px}
+.login-card .btn{width:100%;padding:12px;font-size:16px;margin-top:5px}
+.login-card .or{text-align:center;margin:15px 0;color:#999;font-size:13px}
+.login-card .btn-key{background:#6c757d;color:#fff;width:100%;padding:12px;border:none;border-radius:10px;cursor:pointer;font-size:15px}
+.login-card .btn-key:hover{background:#5a6268}
+.login-card .error{color:var(--danger);font-size:13px;text-align:center;margin-top:10px;display:none}
+.hidden{display:none!important}
+.action-bar{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px;flex-wrap:wrap;gap:10px}
+.empty-state{text-align:center;padding:40px;color:#999}
+.lang-toggle{background:rgba(255,255,255,.15);border:none;color:#fff;padding:5px 12px;border-radius:6px;cursor:pointer;font-size:12px}
+tr.clickable{cursor:pointer}
+tr.clickable:hover{background:#f0ebff}
+.order-detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:15px;margin-bottom:20px}
+.order-detail-grid .field{padding:10px;background:var(--bg);border-radius:8px}
+.order-detail-grid .field .label{font-size:12px;color:#888}
+.order-detail-grid .field .value{font-size:15px;font-weight:600;margin-top:3px}
+@media(max-width:768px){.sidebar{width:60px;padding:10px}.sidebar h2,.sidebar a span{display:none}.sidebar a{padding:12px;text-align:center}.main{margin-right:60px;width:calc(100% - 60px);padding:15px}.stats-grid{grid-template-columns:repeat(2,1fr)}.form-row{grid-template-columns:1fr}.order-detail-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<div class="login-page" id="loginPage">
+  <div class="login-card">
+    <h2>🔐 لوحة تحكم GlowRX</h2>
+    <div class="form-group">
+      <input type="email" id="loginEmail" placeholder="البريد الإلكتروني" dir="ltr" style="text-align:right">
+    </div>
+    <div class="form-group">
+      <input type="password" id="loginPassword" placeholder="كلمة المرور">
+    </div>
+    <button class="btn btn-primary" onclick="adminLogin()">تسجيل الدخول</button>
+    <div class="or">— أو —</div>
+    <div class="form-group">
+      <input type="password" id="adminKeyInput" placeholder="مفتاح المشرف (Admin Key)">
+    </div>
+    <button class="btn-key" onclick="adminKeyLogin()">تسجيل الدخول بالمفتاح</button>
+    <div class="error" id="loginError">بيانات الدخول غير صحيحة</div>
+  </div>
+</div>
+
+<div class="sidebar" id="sidebar">
+  <h2>⭐ GlowRX</h2>
+  <a class="active" onclick="showSection('dashboard')"><span>📊 الإحصائيات</span></a>
+  <a onclick="showSection('orders')"><span>📦 الطلبات</span></a>
+  <a onclick="showSection('products')"><span>🛍️ المنتجات</span></a>
+  <a onclick="showSection('users')"><span>👥 العملاء</span></a>
+  <a onclick="logout()" style="margin-top:auto"><span>🚪 خروج</span></a>
+</div>
+
+<div class="main" id="mainApp">
+  <div class="header">
+    <h1 id="pageTitle">📊 الإحصائيات</h1>
+    <button class="lang-toggle" onclick="toggleLang()" id="langToggle">English</button>
+  </div>
+
+  <!-- Dashboard -->
+  <div id="section-dashboard">
+    <div class="stats-grid" id="statsGrid"></div>
+    <div class="card">
+      <h3 style="margin-bottom:15px;color:var(--primary)">📋 آخر الطلبات</h3>
+      <div id="recentOrders"></div>
+    </div>
+  </div>
+
+  <!-- Orders -->
+  <div id="section-orders" class="hidden">
+    <div class="tabs" id="orderTabs">
+      <button class="active" onclick="filterOrders('')">الكل</button>
+      <button onclick="filterOrders('pending')">قيد الانتظار</button>
+      <button onclick="filterOrders('confirmed')">مؤكد</button>
+      <button onclick="filterOrders('shipped')">تم الشحن</button>
+      <button onclick="filterOrders('delivered')">تم التوصيل</button>
+      <button onclick="filterOrders('cancelled')">ملغي</button>
+    </div>
+    <div class="search-bar">
+      <input type="text" id="orderSearch" placeholder="🔍 بحث عن طلب..." oninput="loadOrders()">
+    </div>
+    <div class="card"><div id="ordersTable"></div></div>
+  </div>
+
+  <!-- Products -->
+  <div id="section-products" class="hidden">
+    <div class="action-bar">
+      <button class="btn btn-primary" onclick="openProductModal()">➕ إضافة منتج</button>
+      <input type="text" id="productSearch" placeholder="🔍 بحث..." oninput="loadProducts()">
+    </div>
+    <div class="card"><div id="productsTable"></div></div>
+  </div>
+
+  <!-- Users -->
+  <div id="section-users" class="hidden">
+    <div class="search-bar">
+      <input type="text" id="userSearch" placeholder="🔍 بحث عن عميل..." oninput="loadUsers()">
+    </div>
+    <div class="card"><div id="usersTable"></div></div>
+  </div>
+</div>
+
+<!-- Product Modal -->
+<div class="modal" id="productModal">
+  <div class="modal-content">
+    <h3 id="productModalTitle">إضافة منتج جديد</h3>
+    <div class="form-row">
+      <div class="form-group">
+        <label>الاسم (عربي)</label>
+        <input id="pNameAr" placeholder="مثال: أحمر شفاه MAC مات">
+      </div>
+      <div class="form-group">
+        <label>الاسم (English)</label>
+        <input id="pNameEn" placeholder="Ex: MAC Matte Lipstick">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>الوصف (عربي)</label>
+        <textarea id="pDescAr" placeholder="وصف المنتج بالعربية"></textarea>
+      </div>
+      <div class="form-group">
+        <label>الوصف (English)</label>
+        <textarea id="pDescEn" placeholder="Product description in English"></textarea>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>السعر (جنيه)</label>
+        <input type="number" id="pPrice" step="0.01" placeholder="مثال: 150">
+      </div>
+      <div class="form-group">
+        <label>المخزون</label>
+        <input type="number" id="pStock" placeholder="مثال: 50">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>القسم</label>
+        <select id="pCategory"></select>
+      </div>
+      <div class="form-group">
+        <label>مميز</label>
+        <select id="pFeatured">
+          <option value="0">لا</option>
+          <option value="1">نعم</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>صور (رابط لكل سطر)</label>
+      <textarea id="pImages" placeholder="https://images.unsplash.com/photo-..."></textarea>
+    </div>
+    <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:20px">
+      <button class="btn btn-primary" onclick="saveProduct()">💾 حفظ</button>
+      <button class="btn" style="background:var(--border)" onclick="closeProductModal()">إلغاء</button>
+    </div>
+  </div>
+</div>
+
+<!-- Order Detail Modal -->
+<div class="modal" id="orderModal">
+  <div class="modal-content">
+    <h3 style="margin-bottom:15px">📦 تفاصيل الطلب</h3>
+    <div id="orderDetailContent"></div>
+    <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:20px">
+      <button class="btn" style="background:var(--border)" onclick="document.getElementById('orderModal').classList.remove('show')">إغلاق</button>
+    </div>
+  </div>
+</div>
+
+<!-- User Detail Modal -->
+<div class="modal" id="userModal">
+  <div class="modal-content">
+    <h3 style="margin-bottom:15px">👤 تفاصيل العميل</h3>
+    <div id="userDetailContent"></div>
+    <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:20px">
+      <button class="btn" style="background:var(--border)" onclick="document.getElementById('userModal').classList.remove('show')">إغلاق</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const API = window.location.origin + '/api';
+let token = localStorage.getItem('adminToken') || '';
+let adminKey = localStorage.getItem('adminKey') || '';
+let lang = localStorage.getItem('adminLang') || 'ar';
+let editingProductId = null;
+
+function t(ar, en) { return lang === 'ar' ? ar : en; }
+
+document.querySelector('.login-page').classList.remove('hidden');
+
+function showToast(msg, type = 'success') {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.className = 'toast ' + type + ' show';
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+function getHeaders() {
+  const h = { 'Content-Type': 'application/json' };
+  if (token) h['Authorization'] = 'Bearer ' + token;
+  if (adminKey) h['x-admin-key'] = adminKey;
+  return h;
+}
+
+async function api(path, opts = {}) {
+  const res = await fetch(API + path, { ...opts, headers: { ...getHeaders(), ...opts.headers } });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || 'Error');
+  return data;
+}
+
+function toggleLang() {
+  lang = lang === 'ar' ? 'en' : 'ar';
+  localStorage.setItem('adminLang', lang);
+  document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
+  document.getElementById('langToggle').textContent = lang === 'ar' ? 'English' : 'العربية';
+  renderCurrentSection();
+}
+
+// Login
+async function adminLogin() {
+  const email = document.getElementById('loginEmail').value;
+  const pass = document.getElementById('loginPassword').value;
+  try {
+    const data = await api('/auth/login', { method: 'POST', body: JSON.stringify({ email, password }) });
+    if (data.user.role !== 'admin') throw new Error('ليس لديك صلاحية المشرف');
+    token = data.token;
+    localStorage.setItem('adminToken', token);
+    enterApp();
+  } catch(e) {
+    document.getElementById('loginError').style.display = 'block';
+    document.getElementById('loginError').textContent = e.message;
+  }
+}
+
+async function adminKeyLogin() {
+  const key = document.getElementById('adminKeyInput').value;
+  if (!key) return;
+  adminKey = key;
+  localStorage.setItem('adminKey', key);
+  try {
+    await api('/admin/stats');
+    enterApp();
+  } catch(e) {
+    adminKey = '';
+    localStorage.removeItem('adminKey');
+    document.getElementById('loginError').style.display = 'block';
+    document.getElementById('loginError').textContent = 'مفتاح غير صحيح';
+  }
+}
+
+function enterApp() {
+  document.getElementById('loginPage').classList.add('hidden');
+  document.getElementById('sidebar').classList.remove('hidden');
+  document.getElementById('mainApp').classList.remove('hidden');
+  showSection('dashboard');
+}
+
+function logout() {
+  token = ''; adminKey = '';
+  localStorage.removeItem('adminToken');
+  localStorage.removeItem('adminKey');
+  document.getElementById('loginPage').classList.remove('hidden');
+  document.getElementById('sidebar').classList.add('hidden');
+  document.getElementById('mainApp').classList.add('hidden');
+}
+
+// Check auto-login
+if (token || adminKey) {
+  api('/admin/stats').then(() => enterApp()).catch(() => {
+    token = ''; adminKey = ''; localStorage.removeItem('adminToken'); localStorage.removeItem('adminKey');
+  });
+}
+
+// Navigation
+let currentSection = 'dashboard';
+
+function showSection(section) {
+  currentSection = section;
+  document.querySelectorAll('.sidebar a').forEach(a => a.classList.remove('active'));
+  document.querySelectorAll('.main > div[id^="section-"]').forEach(d => d.classList.add('hidden'));
+  document.getElementById('section-' + section).classList.remove('hidden');
+  event?.target?.closest('a')?.classList.add('active');
+  const titles = { dashboard: '📊 ' + t('الإحصائيات','Dashboard'), orders: '📦 ' + t('الطلبات','Orders'), products: '🛍️ ' + t('المنتجات','Products'), users: '👥 ' + t('العملاء','Customers') };
+  document.getElementById('pageTitle').textContent = titles[section] || section;
+  renderCurrentSection();
+}
+
+function renderCurrentSection() {
+  if (currentSection === 'dashboard') loadDashboard();
+  else if (currentSection === 'orders') loadOrders();
+  else if (currentSection === 'products') loadProducts();
+  else if (currentSection === 'users') loadUsers();
+}
+
+// Dashboard
+async function loadDashboard() {
+  try {
+    const data = await api('/admin/stats');
+    const s = data.stats;
+    const ar = [
+      { num: s.totalOrders, label: 'إجمالي الطلبات', icon: '📦' },
+      { num: Math.round(s.totalRevenue).toLocaleString() + ' جنيه', label: 'إجمالي الإيرادات', icon: '💰' },
+      { num: s.totalUsers, label: 'إجمالي العملاء', icon: '👥' },
+      { num: s.totalProducts, label: 'إجمالي المنتجات', icon: '🛍️' },
+      { num: s.pendingOrders, label: 'طلبات معلقة', icon: '⏳' },
+    ];
+    const en = [
+      { num: s.totalOrders, label: 'Total Orders', icon: '📦' },
+      { num: Math.round(s.totalRevenue).toLocaleString() + ' EGP', label: 'Total Revenue', icon: '💰' },
+      { num: s.totalUsers, label: 'Total Customers', icon: '👥' },
+      { num: s.totalProducts, label: 'Total Products', icon: '🛍️' },
+      { num: s.pendingOrders, label: 'Pending Orders', icon: '⏳' },
+    ];
+    const items = lang === 'ar' ? ar : en;
+    document.getElementById('statsGrid').innerHTML = items.map(i =>
+      `<div class="stat-card"><div style="font-size:28px">${i.icon}</div><div class="num">${i.num}</div><div class="label">${i.label}</div></div>`
+    ).join('');
+
+    const recent = data.recentOrders;
+    if (recent.length === 0) {
+      document.getElementById('recentOrders').innerHTML = '<div class="empty-state">' + t('لا توجد طلبات بعد','No orders yet') + '</div>';
+    } else {
+      const h = t('العميل','Customer');
+      const h2 = t('المجموع','Total');
+      const h3 = t('الحالة','Status');
+      const h4 = t('التاريخ','Date');
+      document.getElementById('recentOrders').innerHTML = `<table>
+        <tr><th>#</th><th>${h}</th><th>${h2}</th><th>${h3}</th><th>${h4}</th></tr>
+        ${recent.map(o => `<tr class="clickable" onclick="showOrderDetail(${o.id})"><td>#${o.id}</td><td>${o.user_name || '—'}</td><td>${Math.round(o.total)} EGP</td><td><span class="badge ${o.status}">${o.status}</span></td><td>${new Date(o.created_at).toLocaleDateString()}</td></tr>`).join('')}
+      </table>`;
+    }
+  } catch(e) { showToast(e.message, 'error'); }
+}
+
+// Orders
+let orderFilter = '';
+let orderPage = 1;
+
+function filterOrders(status) {
+  orderFilter = status; orderPage = 1;
+  document.querySelectorAll('#orderTabs button').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+  loadOrders();
+}
+
+async function loadOrders() {
+  try {
+    const search = document.getElementById('orderSearch').value;
+    const q = new URLSearchParams({ status: orderFilter, page: orderPage, limit: 20 });
+    if (search) q.set('search', search);
+    const data = await api('/admin/orders?' + q.toString());
+    if (data.orders.length === 0) {
+      document.getElementById('ordersTable').innerHTML = '<div class="empty-state">' + t('لا توجد طلبات','No orders found') + '</div>';
+      return;
+    }
+    const h = [t('العميل','Customer'), t('المجموع','Total'), t('طريقة الدفع','Payment'), t('الحالة','Status'), t('التاريخ','Date'), t('إجراءات','Actions')];
+    document.getElementById('ordersTable').innerHTML = `<table>
+      <tr><th>#</th>${h.map(hh => `<th>${hh}</th>`).join('')}</tr>
+      ${data.orders.map(o => `<tr>
+        <td class="clickable" onclick="showOrderDetail(${o.id})">#${o.id}</td>
+        <td>${o.user_name || t('زائر','Guest')}<br><small style="color:#888">${o.phone || ''}</small></td>
+        <td>${Math.round(o.total)} EGP</td>
+        <td>${o.payment_method}</td>
+        <td><span class="badge ${o.status}">${o.status}</span></td>
+        <td>${new Date(o.created_at).toLocaleDateString()}</td>
+        <td>
+          <select class="status-select" onchange="updateOrderStatus(${o.id}, this.value)">
+            <option value="pending" ${o.status==='pending'?'selected':''}>pending</option>
+            <option value="confirmed" ${o.status==='confirmed'?'selected':''}>confirmed</option>
+            <option value="shipped" ${o.status==='shipped'?'selected':''}>shipped</option>
+            <option value="delivered" ${o.status==='delivered'?'selected':''}>delivered</option>
+            <option value="cancelled" ${o.status==='cancelled'?'selected':''}>cancelled</option>
+          </select>
+        </td>
+      </tr>`).join('')}
+    </table>`;
+    const totalPages = Math.ceil(data.total / data.limit);
+    document.getElementById('ordersTable').innerHTML += `<div class="pagination">
+      <button ${orderPage<=1?'disabled':''} onclick="orderPage--;loadOrders()">${t('السابق','Prev')}</button>
+      <span>${orderPage} / ${totalPages}</span>
+      <button ${orderPage>=totalPages?'disabled':''} onclick="orderPage++;loadOrders()">${t('التالي','Next')}</button>
+    </div>`;
+  } catch(e) { showToast(e.message, 'error'); }
+}
+
+async function showOrderDetail(id) {
+  try {
+    const o = await api('/admin/orders/' + id);
+    const items = o.items.map(i => `${i.name_ar || i.name} x${i.quantity} — ${Math.round(i.price * i.quantity)} EGP`).join('<br>');
+    document.getElementById('orderDetailContent').innerHTML = `
+      <div class="order-detail-grid">
+        <div class="field"><div class="label">${t('رقم الطلب','Order #')}</div><div class="value">#${o.id}</div></div>
+        <div class="field"><div class="label">${t('حالة','Status')}</div><div class="value"><span class="badge ${o.status}">${o.status}</span></div></div>
+        <div class="field"><div class="label">${t('العميل','Customer')}</div><div class="value">${o.user_name || t('زائر','Guest')}</div></div>
+        <div class="field"><div class="label">${t('الإيميل','Email')}</div><div class="value">${o.user_email || '—'}</div></div>
+        <div class="field"><div class="label">${t('الهاتف','Phone')}</div><div class="value">${o.user_phone || o.phone || '—'}</div></div>
+        <div class="field"><div class="label">${t('طريقة الدفع','Payment')}</div><div class="value">${o.payment_method}</div></div>
+        <div class="field"><div class="label">${t('حالة الدفع','Payment Status')}</div><div class="value">${o.payment_status}</div></div>
+        <div class="field"><div class="label">${t('المجموع','Total')}</div><div class="value">${Math.round(o.total)} EGP</div></div>
+        <div class="field" style="grid-column:1/-1"><div class="label">${t('عنوان الشحن','Address')}</div><div class="value">${o.shipping_address || '—'}</div></div>
+        <div class="field" style="grid-column:1/-1"><div class="label">${t('ملاحظات','Notes')}</div><div class="value">${o.notes || '—'}</div></div>
+        <div class="field" style="grid-column:1/-1"><div class="label">${t('المنتجات','Items')}</div><div class="value">${items}</div></div>
+      </div>
+      <div style="margin-top:15px">
+        <label style="font-weight:600;font-size:14px">${t('تحديث الحالة','Update Status')}:</label>
+        <select class="status-select" onchange="updateOrderStatus(${o.id}, this.value)">${['pending','confirmed','shipped','delivered','cancelled'].map(s => `<option ${s===o.status?'selected':''} value="${s}">${s}</option>`).join('')}</select>
+      </div>`;
+    document.getElementById('orderModal').classList.add('show');
+  } catch(e) { showToast(e.message, 'error'); }
+}
+
+async function updateOrderStatus(id, status) {
+  try {
+    await api('/admin/orders/' + id + '/status', { method: 'PUT', body: JSON.stringify({ status }) });
+    showToast(t('تم تحديث الطلب','Order updated'));
+    loadOrders();
+  } catch(e) { showToast(e.message, 'error'); }
+}
+
+// Products
+let productPage = 1;
+
+async function loadProducts() {
+  try {
+    const data = await api('/admin/products');
+    const search = document.getElementById('productSearch').value.toLowerCase();
+    let products = data.products;
+    if (search) products = products.filter(p => p.name_ar.includes(search) || p.name_en.toLowerCase().includes(search));
+    if (products.length === 0) {
+      document.getElementById('productsTable').innerHTML = '<div class="empty-state">' + t('لا توجد منتجات','No products') + '</div>';
+      return;
+    }
+    const h = [t('الاسم','Name'), t('السعر','Price'), t('المخزون','Stock'), t('القسم','Category'), t('مميز','Featured'), t('إجراءات','Actions')];
+    document.getElementById('productsTable').innerHTML = `<table>
+      <tr><th>#</th>${h.map(hh => `<th>${hh}</th>`).join('')}</tr>
+      ${products.map(p => `<tr>
+        <td>${p.id}</td>
+        <td>${lang === 'ar' ? p.name_ar : p.name_en}</td>
+        <td>${Math.round(p.price)} EGP</td>
+        <td>${p.stock}</td>
+        <td>${lang === 'ar' ? (p.category_ar || '—') : (p.category_en || '—')}</td>
+        <td>${p.featured ? '⭐' : '—'}</td>
+        <td>
+          <button class="btn btn-sm btn-outline" onclick="openProductModal(${p.id})">✏️</button>
+          <button class="btn btn-sm btn-danger" onclick="deleteProduct(${p.id})">🗑️</button>
+        </td>
+      </tr>`).join('')}
+    </table>`;
+  } catch(e) { showToast(e.message, 'error'); }
+}
+
+async function openProductModal(id = null) {
+  editingProductId = id;
+  document.getElementById('productModalTitle').textContent = id ? t('تعديل المنتج','Edit Product') : t('إضافة منتج جديد','Add New Product');
+  document.getElementById('pNameAr').value = '';
+  document.getElementById('pNameEn').value = '';
+  document.getElementById('pDescAr').value = '';
+  document.getElementById('pDescEn').value = '';
+  document.getElementById('pPrice').value = '';
+  document.getElementById('pStock').value = '';
+  document.getElementById('pFeatured').value = '0';
+  document.getElementById('pImages').value = '';
+
+  // Load categories
+  const catRes = await fetch(API + '/products');
+  const catData = await catRes.json();
+  const cats = catData.categories || [];
+  document.getElementById('pCategory').innerHTML = cats.map(c => `<option value="${c.id}">${c.name_ar} / ${c.name_en}</option>`).join('');
+
+  if (id) {
+    try {
+      const data = await api('/admin/products');
+      const p = data.products.find(x => x.id === id);
+      if (p) {
+        document.getElementById('pNameAr').value = p.name_ar;
+        document.getElementById('pNameEn').value = p.name_en;
+        document.getElementById('pDescAr').value = p.description_ar || '';
+        document.getElementById('pDescEn').value = p.description_en || '';
+        document.getElementById('pPrice').value = p.price;
+        document.getElementById('pStock').value = p.stock;
+        document.getElementById('pCategory').value = p.category_id;
+        document.getElementById('pFeatured').value = p.featured;
+        document.getElementById('pImages').value = JSON.parse(p.images || '[]').join('\n');
+      }
+    } catch(e) { showToast(e.message, 'error'); }
+  }
+  document.getElementById('productModal').classList.add('show');
+}
+
+function closeProductModal() { document.getElementById('productModal').classList.remove('show'); editingProductId = null; }
+
+async function saveProduct() {
+  const body = {
+    name_ar: document.getElementById('pNameAr').value,
+    name_en: document.getElementById('pNameEn').value,
+    description_ar: document.getElementById('pDescAr').value,
+    description_en: document.getElementById('pDescEn').value,
+    price: parseFloat(document.getElementById('pPrice').value),
+    stock: parseInt(document.getElementById('pStock').value) || 0,
+    category_id: parseInt(document.getElementById('pCategory').value),
+    featured: parseInt(document.getElementById('pFeatured').value),
+    images: document.getElementById('pImages').value.split('\n').filter(s => s.trim()),
+  };
+  if (!body.name_ar || !body.name_en) return showToast(t('الاسم مطلوب','Name is required'), 'error');
+  try {
+    if (editingProductId) {
+      await api('/admin/products/' + editingProductId, { method: 'PUT', body: JSON.stringify(body) });
+      showToast(t('تم تعديل المنتج','Product updated'));
+    } else {
+      await api('/admin/products', { method: 'POST', body: JSON.stringify(body) });
+      showToast(t('تمت إضافة المنتج','Product added'));
+    }
+    closeProductModal();
+    loadProducts();
+  } catch(e) { showToast(e.message, 'error'); }
+}
+
+async function deleteProduct(id) {
+  if (!confirm(t('متأكد من حذف المنتج؟','Delete this product?'))) return;
+  try {
+    await api('/admin/products/' + id, { method: 'DELETE' });
+    showToast(t('تم الحذف','Deleted'));
+    loadProducts();
+  } catch(e) { showToast(e.message, 'error'); }
+}
+
+// Users
+async function loadUsers() {
+  try {
+    const data = await api('/admin/users');
+    const search = document.getElementById('userSearch').value.toLowerCase();
+    let users = data.users;
+    if (search) users = users.filter(u => u.name.toLowerCase().includes(search) || u.email.toLowerCase().includes(search) || (u.phone || '').includes(search));
+    if (users.length === 0) {
+      document.getElementById('usersTable').innerHTML = '<div class="empty-state">' + t('لا يوجد عملاء','No customers found') + '</div>';
+      return;
+    }
+    const h = [t('الاسم','Name'), t('الإيميل','Email'), t('الهاتف','Phone'), t('الطلبات','Orders'), t('الدور','Role'), t('تاريخ التسجيل','Joined')];
+    document.getElementById('usersTable').innerHTML = `<table>
+      <tr><th>#</th>${h.map(hh => `<th>${hh}</th>`).join('')}</tr>
+      ${users.map(u => `<tr class="clickable" onclick="showUserDetail(${u.id})">
+        <td>${u.id}</td>
+        <td>${u.name}</td>
+        <td>${u.email}</td>
+        <td>${u.phone || '—'}</td>
+        <td>${u.order_count || 0}</td>
+        <td>${u.role === 'admin' ? '👑 ' + t('مشرف','Admin') : t('عميل','Customer')}</td>
+        <td>${new Date(u.created_at).toLocaleDateString()}</td>
+      </tr>`).join('')}
+    </table>`;
+  } catch(e) { showToast(e.message, 'error'); }
+}
+
+async function showUserDetail(id) {
+  try {
+    const data = await api('/admin/users/' + id);
+    const u = data.user;
+    const ordersHtml = data.orders.length === 0 ? '<div style="color:#999;padding:10px">' + t('لا توجد طلبات','No orders') + '</div>' :
+      `<table><tr><th>#</th><th>${t('المجموع','Total')}</th><th>${t('الحالة','Status')}</th><th>${t('التاريخ','Date')}</th></tr>
+      ${data.orders.map(o => `<tr><td>#${o.id}</td><td>${Math.round(o.total)} EGP</td><td><span class="badge ${o.status}">${o.status}</span></td><td>${new Date(o.created_at).toLocaleDateString()}</td></tr>`).join('')}</table>`;
+    document.getElementById('userDetailContent').innerHTML = `
+      <div class="order-detail-grid">
+        <div class="field"><div class="label">${t('الاسم','Name')}</div><div class="value">${u.name}</div></div>
+        <div class="field"><div class="label">${t('الإيميل','Email')}</div><div class="value">${u.email}</div></div>
+        <div class="field"><div class="label">${t('الهاتف','Phone')}</div><div class="value">${u.phone || '—'}</div></div>
+        <div class="field"><div class="label">${t('العنوان','Address')}</div><div class="value">${u.address || '—'}</div></div>
+        <div class="field"><div class="label">${t('الدور','Role')}</div><div class="value">${u.role}</div></div>
+        <div class="field"><div class="label">${t('تاريخ التسجيل','Joined')}</div><div class="value">${new Date(u.created_at).toLocaleDateString()}</div></div>
+      </div>
+      <h4 style="margin:15px 0 10px;color:var(--primary)">📦 ${t('الطلبات','Orders')}</h4>
+      ${ordersHtml}`;
+    document.getElementById('userModal').classList.add('show');
+  } catch(e) { showToast(e.message, 'error'); }
+}
+
+// Init
+if (lang === 'en') { document.documentElement.dir = 'ltr'; document.getElementById('langToggle').textContent = 'العربية'; }
+</script>
+</body>
+</html>

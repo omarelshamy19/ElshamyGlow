@@ -5,6 +5,7 @@ const { initDb, dbRun, dbGet, dbAll } = require('./db.js');
 const productsRouter = require('./routes/products.js');
 const authRouter = require('./routes/auth.js');
 const ordersRouter = require('./routes/orders.js');
+const adminRouter = require('./routes/admin.js');
 
 const app = express();
 app.use(cors());
@@ -63,6 +64,13 @@ app.use((req, res, next) => {
       if (!prodCount || prodCount.c === 0) {
         for (const p of productsData) dbRun('INSERT INTO products (name_ar, name_en, description_ar, description_en, price, stock, category_id, featured, images) VALUES (?,?,?,?,?,?,?,?,?)', p);
       }
+      const adminExists = dbGet("SELECT id FROM users WHERE role = 'admin'");
+      if (!adminExists) {
+        const adminEmail = process.env.ADMIN_EMAIL || 'admin@glowrx.com';
+        const adminPass = process.env.ADMIN_PASSWORD || 'admin123';
+        const hashed = require('bcryptjs').hashSync(adminPass, 10);
+        dbRun("INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, 'admin')", ['Admin', adminEmail, hashed]);
+      }
       ready = true;
     }).catch(e => console.error('Init error:', e));
   }
@@ -72,6 +80,7 @@ app.use((req, res, next) => {
 app.use('/api/products', productsRouter);
 app.use('/api/auth', authRouter);
 app.use('/api/orders', ordersRouter);
+app.use('/api/admin', adminRouter);
 
 app.get('/api/health', (req, res) => res.json({ status: 'ok' }));
 app.get('/api/debug', (req, res) => {
