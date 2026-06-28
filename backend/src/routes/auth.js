@@ -71,7 +71,6 @@ router.post('/send-verification', async (req, res) => {
     const code = generateCode();
     const expiresAt = new Date(Date.now() + 10 * 60 * 1000).toISOString();
     dbRun('UPDATE users SET verification_code = ?, verification_expires_at = ? WHERE id = ?', [code, expiresAt, user.id]);
-    // Try to send email via nodemailer if configured
     const smtpHost = process.env.SMTP_HOST;
     if (smtpHost) {
       try {
@@ -81,20 +80,20 @@ router.post('/send-verification', async (req, res) => {
           secure: process.env.SMTP_SECURE === 'true',
           auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS }
         });
-        const info = await transporter.sendMail({
+        await transporter.sendMail({
           from: process.env.SMTP_FROM || process.env.SMTP_USER,
           to: user.email, subject: 'GlowRX - Verification Code',
           text: 'Your verification code is: ' + code,
           html: '<h2>GlowRX</h2><p>Your verification code is: <strong>' + code + '</strong></p>'
         });
-        console.log('Email sent successfully:', info.messageId);
+        return res.json({ message: 'Verification code sent to your email' });
       } catch(e) {
-        console.error('Email send failed:', e.message, e.code);
+        console.error('Email send failed:', e.message, e.code, e.stack);
+        return res.json({ message: 'SMTP error: ' + e.message, code: code });
       }
-    } else {
-      console.log('SMTP not configured, showing code on screen');
     }
-    res.json({ message: 'Verification code sent', code: smtpHost ? undefined : code });
+    console.log('SMTP not configured, showing code on screen');
+    res.json({ message: 'Verification code sent', code: code });
   } catch { res.status(401).json({ error: 'Invalid token' }); }
 });
 
@@ -161,6 +160,28 @@ router.get('/google/callback', async (req, res) => {
     res.redirect(dest);
   } catch(e) {
     res.redirect(customRedirect || frontendUrl + '?error=google_auth_error');
+  }
+});
+
+// Test email SMTP
+router.get('/test-email', async (req, res) => {
+  const to = req.query.email || process.env.SMTP_USER || 'test@example.com';
+  const smtpHost = process.env.SMTP_HOST;
+  if (!smtpHost) return res.json({ status: 'SMTP_NOT_CONFIGURED', env_checks: { SMTP_HOST: !!process.env.SMTP_HOST, SMTP_PORT: process.env.SMTP_PORT, SMTP_USER: !!process.env.SMTP_USER, SMTP_PASS: !!process.env.SMTP_PASS } });
+  try {
+    const nodemailer = require('nodemailer');
+    const transporter = nodemailer.createTransport({
+      host: smtpHost, port: parseInt(process.env.SMTP_PORT) || 587,
+      secure: process.env.SMTP_SECURE === 'true',
+      auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS }
+    });
+    const info = await transporter.sendMail({
+      from: process.env.SMTP_FROM || process.env.SMTP_USER,
+      to, subject: 'GlowRX SMTP Test', text: 'If you receive this, SMTP is working!'
+    });
+    res.json({ status: 'OK', messageId: info.messageId });
+  } catch(e) {
+    res.json({ status: 'ERROR', error: e.message, code: e.code, stack: e.stack?.split('\n')[0] });
   }
 });
 
