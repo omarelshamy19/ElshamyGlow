@@ -53,10 +53,8 @@ const authLimiter = rateLimit({
 });
 
 // Body parser with size limit
-app.use(express.json({ limit: '1mb' }));
-app.use(express.urlencoded({ extended: true, limit: '1mb' }));
-// Larger limit for admin (product images)
-app.use('/api/admin', express.json({ limit: '5mb' }));
+app.use(express.json({ limit: '5mb' }));
+app.use(express.urlencoded({ extended: true, limit: '5mb' }));
 
 const categoriesData = [
   ['أحمر شفاه', 'Lipstick'],
@@ -95,23 +93,28 @@ let ready = false;
 
 app.use(async (req, res, next) => {
   if (!ready) {
-    await initDb();
-    const catCount = await dbGet("SELECT COUNT(*) as c FROM categories");
-    if (!catCount || catCount.c === 0) {
-      for (const c of categoriesData) await dbRun('INSERT INTO categories (name_ar, name_en) VALUES (?, ?)', c);
+    try {
+      await initDb();
+      const catCount = await dbGet("SELECT COUNT(*) as c FROM categories");
+      if (!catCount || catCount.c === 0) {
+        for (const c of categoriesData) await dbRun('INSERT INTO categories (name_ar, name_en) VALUES (?, ?)', c);
+      }
+      const prodCount = await dbGet("SELECT COUNT(*) as c FROM products");
+      if (!prodCount || prodCount.c === 0) {
+        for (const p of productsData) await dbRun('INSERT INTO products (name_ar, name_en, description_ar, description_en, price, stock, category_id, featured, images) VALUES (?,?,?,?,?,?,?,?,?)', p);
+      }
+      const adminExists = await dbGet("SELECT id FROM users WHERE role = 'admin'");
+      if (!adminExists) {
+        const adminEmail = process.env.ADMIN_EMAIL || 'admin@glowrx.com';
+        const adminPass = process.env.ADMIN_PASSWORD || 'admin123';
+        const hashed = require('bcryptjs').hashSync(adminPass, 10);
+        await dbRun("INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, 'admin')", ['Admin', adminEmail, hashed]);
+      }
+      ready = true;
+    } catch (e) {
+      console.error('Init error:', e.message);
+      return res.status(500).json({ error: 'Init failed: ' + e.message });
     }
-    const prodCount = await dbGet("SELECT COUNT(*) as c FROM products");
-    if (!prodCount || prodCount.c === 0) {
-      for (const p of productsData) await dbRun('INSERT INTO products (name_ar, name_en, description_ar, description_en, price, stock, category_id, featured, images) VALUES (?,?,?,?,?,?,?,?,?)', p);
-    }
-    const adminExists = await dbGet("SELECT id FROM users WHERE role = 'admin'");
-    if (!adminExists) {
-      const adminEmail = process.env.ADMIN_EMAIL || 'admin@glowrx.com';
-      const adminPass = process.env.ADMIN_PASSWORD || 'admin123';
-      const hashed = require('bcryptjs').hashSync(adminPass, 10);
-      await dbRun("INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, 'admin')", ['Admin', adminEmail, hashed]);
-    }
-    ready = true;
   }
   next();
 });
