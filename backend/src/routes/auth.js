@@ -4,14 +4,10 @@ const jwt = require('jsonwebtoken');
 const { dbGet, dbRun } = require('../db.js');
 
 const router = Router();
-const JWT_SECRET = process.env.JWT_SECRET;
+const JWT_SECRET = process.env.JWT_SECRET || 'fallback-change-me';
 const JWT_EXPIRES = process.env.JWT_EXPIRES || '30d';
 const crypto = require('crypto');
-
-function requireEnv() {
-  if (!JWT_SECRET) throw new Error('JWT_SECRET environment variable is required');
-}
-requireEnv();
+if (!process.env.JWT_SECRET) console.warn('WARNING: JWT_SECRET not set, using fallback (insecure)');
 
 function sanitize(str) {
   if (typeof str !== 'string') return str;

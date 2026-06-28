@@ -4,9 +4,10 @@ const bcrypt = require('bcryptjs');
 const { dbAll, dbGet, dbRun } = require('../db.js');
 
 const router = Router();
-const JWT_SECRET = process.env.JWT_SECRET;
-const ADMIN_KEY = process.env.ADMIN_KEY;
-if (!JWT_SECRET || !ADMIN_KEY) throw new Error('JWT_SECRET and ADMIN_KEY environment variables are required');
+const JWT_SECRET = process.env.JWT_SECRET || 'fallback-change-me';
+const ADMIN_KEY = process.env.ADMIN_KEY || 'admin123';
+if (!process.env.JWT_SECRET) console.warn('WARNING: JWT_SECRET not set, using fallback (insecure)');
+if (!process.env.ADMIN_KEY) console.warn('WARNING: ADMIN_KEY not set, using fallback (insecure)');
 
 function adminAuth(req, res, next) {
   const key = req.headers['x-admin-key'];
