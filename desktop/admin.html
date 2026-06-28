@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>GlowRX Manager - لوحة التحكم</title>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
 :root {
   --primary: #8B2F8E; --primary-dark: #6B1F6E; --primary-light: #B35CB6;
@@ -266,6 +267,9 @@ select.status-select{
 
 /* ─── Responsive ─── */
 @media(max-width:768px){:root{--sidebar-w:60px}.sidebar-header .logo,.sidebar-header .logo-sub,.sidebar-nav a span,.sidebar-footer a span,.api-status span{display:none}.sidebar-nav a{padding:12px;justify-content:center}.main{margin-right:60px}.content{padding:16px}.stats-grid{grid-template-columns:repeat(2,1fr)}.form-row{grid-template-columns:1fr}.order-detail-grid{grid-template-columns:1fr}}
+
+.badge.low-stock{background:rgba(239,68,68,0.12);color:#dc2626;animation:pulse 2s infinite}
+.chart-loading{text-align:center;padding:60px 20px;color:var(--text2);font-size:14px}
 </style>
 </head>
 <body>
@@ -296,12 +300,17 @@ select.status-select{
   <div class="sidebar-header">
     <div class="logo">✦ GlowRX</div>
     <div class="logo-sub">لوحة التحكم</div>
+    <div id="lowStockAlert" style="display:none;margin-top:6px;cursor:pointer" onclick="showSection('products');showLowStock()">
+      <span style="background:#ef4444;color:#fff;font-size:10px;padding:2px 10px;border-radius:10px;">⚠️ <span id="lowStockCount">0</span> منخفض</span>
+    </div>
   </div>
   <nav class="sidebar-nav">
     <a class="active" onclick="showSection('dashboard')"><span class="icon">📊</span><span>الإحصائيات</span></a>
     <a onclick="showSection('orders')"><span class="icon">📦</span><span>الطلبات</span></a>
     <a onclick="showSection('products')"><span class="icon">🛍️</span><span>المنتجات</span></a>
     <a onclick="showSection('users')"><span class="icon">👥</span><span>العملاء</span></a>
+    <a onclick="showSection('coupons')"><span class="icon">🎟️</span><span>الكوبونات</span></a>
+    <a onclick="showSection('reports')"><span class="icon">📈</span><span>التقارير</span></a>
   </nav>
   <div class="sidebar-footer">
     <a href="#" onclick="viewStore()"><span class="icon">🌐</span><span>عرض المتجر</span></a>
@@ -332,18 +341,24 @@ select.status-select{
 
     <!-- Orders -->
     <div id="section-orders" class="hidden">
-      <div class="tabs" id="orderTabs">
-        <button class="active" onclick="filterOrders('')">الكل</button>
-        <button onclick="filterOrders('pending')">قيد الانتظار</button>
-        <button onclick="filterOrders('confirmed')">مؤكد</button>
-        <button onclick="filterOrders('shipped')">تم الشحن</button>
-        <button onclick="filterOrders('delivered')">تم التوصيل</button>
-        <button onclick="filterOrders('cancelled')">ملغي</button>
+      <div class="card">
+        <div class="card-header">
+          <h3>📦 الطلبات</h3>
+          <button class="btn btn-sm btn-outline" onclick="exportOrders()">📥 تصدير CSV</button>
+        </div>
+        <div class="tabs" id="orderTabs">
+          <button class="active" onclick="filterOrders('')">الكل</button>
+          <button onclick="filterOrders('pending')">قيد الانتظار</button>
+          <button onclick="filterOrders('confirmed')">مؤكد</button>
+          <button onclick="filterOrders('shipped')">تم الشحن</button>
+          <button onclick="filterOrders('delivered')">تم التوصيل</button>
+          <button onclick="filterOrders('cancelled')">ملغي</button>
+        </div>
+        <div class="search-bar">
+          <input type="text" id="orderSearch" placeholder="🔍 بحث عن طلب..." oninput="loadOrders()">
+        </div>
+        <div id="ordersTable"></div>
       </div>
-      <div class="search-bar">
-        <input type="text" id="orderSearch" placeholder="🔍 بحث عن طلب..." oninput="loadOrders()">
-      </div>
-      <div class="card"><div id="ordersTable"></div></div>
     </div>
 
     <!-- Products -->
@@ -368,6 +383,43 @@ select.status-select{
           <input type="text" id="userSearch" placeholder="🔍 بحث عن عميل..." oninput="loadUsers()">
         </div>
         <div id="usersTable"></div>
+      </div>
+    </div>
+
+    <!-- Coupons -->
+    <div id="section-coupons" class="hidden">
+      <div class="card">
+        <div class="card-header">
+          <h3>🎟️ الكوبونات</h3>
+          <button class="btn btn-primary btn-sm" onclick="openCouponModal()">+ إضافة</button>
+        </div>
+        <div class="search-bar">
+          <input type="text" id="couponSearch" placeholder="🔍 بحث..." oninput="loadCoupons()">
+        </div>
+        <div id="couponsTable"></div>
+      </div>
+    </div>
+
+    <!-- Reports -->
+    <div id="section-reports" class="hidden">
+      <div class="card">
+        <div class="card-header"><h3>📈 تقرير المبيعات</h3></div>
+        <div style="margin-bottom:16px">
+          <button class="btn btn-sm" style="background:var(--gradient);color:#fff;border:none;padding:6px 16px;border-radius:20px;cursor:pointer;font-family:inherit;font-size:12px" onclick="loadSalesData(7)">7 أيام</button>
+          <button class="btn btn-sm btn-outline" onclick="loadSalesData(30)">30 يوم</button>
+          <button class="btn btn-sm btn-outline" onclick="loadSalesData(90)">90 يوم</button>
+        </div>
+        <div style="max-width:100%;height:300px"><canvas id="salesChart"></canvas></div>
+        <div style="margin-top:18px;display:flex;gap:20px;flex-wrap:wrap">
+          <div style="background:var(--bg);border-radius:var(--radius-sm);padding:16px 20px;flex:1;min-width:140px;text-align:center">
+            <div style="font-size:11px;color:var(--text2)">إجمالي المبيعات</div>
+            <div style="font-size:24px;font-weight:800;background:var(--gradient);-webkit-background-clip:text;-webkit-text-fill-color:transparent" id="salesTotal">0 EGP</div>
+          </div>
+          <div style="background:var(--bg);border-radius:var(--radius-sm);padding:16px 20px;flex:1;min-width:140px;text-align:center">
+            <div style="font-size:11px;color:var(--text2)">متوسط اليوم</div>
+            <div style="font-size:24px;font-weight:800;color:var(--text)" id="salesAvg">0 EGP</div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -406,6 +458,7 @@ select.status-select{
     <h3>📦 تفاصيل الطلب</h3>
     <div id="orderDetailContent"></div>
     <div class="modal-actions">
+      <button class="btn btn-primary btn-sm" onclick="printInvoice()" id="printInvoiceBtn" style="display:none">🖨️ طباعة</button>
       <button class="btn btn-outline" onclick="closeModal('orderModal')">إغلاق</button>
     </div>
   </div>
@@ -417,6 +470,26 @@ select.status-select{
     <div id="userDetailContent"></div>
     <div class="modal-actions">
       <button class="btn btn-outline" onclick="closeModal('userModal')">إغلاق</button>
+    </div>
+  </div>
+</div>
+
+<!-- Coupon Modal -->
+<div class="modal-overlay" id="couponModal">
+  <div class="modal">
+    <h3 id="couponModalTitle">إضافة كوبون</h3>
+    <div class="form-row">
+      <div class="form-group"><label>الكود</label><input id="cCode" placeholder="SALE20" style="text-transform:uppercase"></div>
+      <div class="form-group"><label>نسبة الخصم (%)</label><input type="number" id="cDiscount" step="0.01" min="0" max="100"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>الحد الأقصى للاستخدام</label><input type="number" id="cMaxUses" value="0" placeholder="0 = غير محدود"></div>
+      <div class="form-group"><label>أقل قيمة للطلب</label><input type="number" id="cMinOrder" value="0" step="0.01"></div>
+    </div>
+    <div class="form-group"><label>تاريخ الانتهاء (اختياري)</label><input type="date" id="cExpires"></div>
+    <div class="modal-actions">
+      <button class="btn btn-primary" onclick="saveCoupon()">💾 حفظ</button>
+      <button class="btn btn-outline" onclick="closeCouponModal()">إلغاء</button>
     </div>
   </div>
 </div>
@@ -526,7 +599,7 @@ function showSection(s) {
   const activeLink = event?.target?.closest('a');
   if (activeLink) activeLink.classList.add('active');
   else document.querySelector(`.sidebar-nav a[onclick*="${s}"]`)?.classList.add('active');
-  const titles = { dashboard: '📊 ' + t('الإحصائيات','Dashboard'), orders: '📦 ' + t('الطلبات','Orders'), products: '🛍️ ' + t('المنتجات','Products'), users: '👥 ' + t('العملاء','Customers') };
+  const titles = { dashboard: '📊 ' + t('الإحصائيات','Dashboard'), orders: '📦 ' + t('الطلبات','Orders'), products: '🛍️ ' + t('المنتجات','Products'), users: '👥 ' + t('العملاء','Customers'), coupons: '🎟️ ' + t('الكوبونات','Coupons'), reports: '📈 ' + t('التقارير','Reports') };
   document.getElementById('pageTitle').textContent = titles[s] || s;
   renderCurrentSection();
 }
@@ -535,6 +608,8 @@ function renderCurrentSection() {
   else if (currentSection === 'orders') loadOrders();
   else if (currentSection === 'products') loadProducts();
   else if (currentSection === 'users') loadUsers();
+  else if (currentSection === 'coupons') loadCoupons();
+  else if (currentSection === 'reports') loadSalesData(30);
 }
 
 async function checkAPI() {
@@ -637,6 +712,8 @@ async function showOrderDetail(id) {
       <select class="status-select" onchange="updateOrderStatus(${o.id}, this.value)" style="margin-right:8px">
         ${['pending','confirmed','shipped','delivered','cancelled'].map(s => `<option ${s===o.status?'selected':''} value="${s}">${s}</option>`).join('')}
       </select>`;
+    document.getElementById('printInvoiceBtn').style.display = '';
+    document.getElementById('printInvoiceBtn').onclick = () => printInvoice(id);
     document.getElementById('orderModal').classList.add('show');
   } catch(e) { showToast(e.message, 'error'); }
 }
@@ -653,12 +730,13 @@ async function loadProducts() {
     const search = document.getElementById('productSearch').value.toLowerCase();
     let products = data.products;
     if (search) products = products.filter(p => p.name_ar.includes(search) || p.name_en.toLowerCase().includes(search));
+    if (lowStockFilter) products = products.filter(p => p.stock <= 5);
     if (!products.length) { document.getElementById('productsTable').innerHTML = '<div class="empty-state"><div class="empty-icon">🛍️</div><p>' + t('لا توجد منتجات','No products') + '</p></div>'; return; }
     document.getElementById('productsTable').innerHTML = `<div class="table-wrap"><table>
       <tr><th>#</th><th>${t('الاسم','Name')}</th><th>${t('السعر','Price')}</th><th>${t('المخزون','Stock')}</th><th>${t('القسم','Category')}</th><th>${t('مميز','Featured')}</th><th></th></tr>
       ${products.map(p => `<tr>
         <td>${p.id}</td><td>${lang === 'ar' ? p.name_ar : p.name_en}</td>
-        <td style="font-weight:600;color:var(--primary)">${Math.round(p.price)} EGP</td><td>${p.stock}</td>
+        <td style="font-weight:600;color:var(--primary)">${Math.round(p.price)} EGP</td><td><span class="${p.stock <= 5 ? 'badge low-stock' : ''}">${p.stock} ${p.stock <= 5 ? '⚠️' : ''}</span></td>
         <td>${lang === 'ar' ? (p.category_ar||'—') : (p.category_en||'—')}</td>
         <td>${p.featured ? '⭐' : '—'}</td>
         <td><button class="btn btn-sm btn-outline" onclick="openProductModal(${p.id})">✏️</button> <button class="btn btn-sm" style="background:var(--danger);color:#fff;padding:4px 10px;border:none;border-radius:6px;cursor:pointer;font-size:12px" onclick="deleteProduct(${p.id})">🗑️</button></td>
@@ -747,6 +825,217 @@ async function showUserDetail(id) {
 }
 
 function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+
+// ─── LOW STOCK ───
+async function checkLowStock() {
+  try {
+    const data = await api('/admin/low-stock?threshold=5');
+    const el = document.getElementById('lowStockAlert');
+    const count = document.getElementById('lowStockCount');
+    if (data.products.length > 0) {
+      el.style.display = 'block';
+      count.textContent = data.products.length;
+    } else {
+      el.style.display = 'none';
+    }
+  } catch(e) {}
+}
+let lowStockFilter = false;
+function showLowStock() {
+  lowStockFilter = !lowStockFilter;
+  loadProducts();
+  if (!lowStockFilter) lowStockFilter = false;
+}
+
+// Include low stock check in dashboard load
+const origLoadDashboard = loadDashboard;
+loadDashboard = async function() {
+  await origLoadDashboard.call(this);
+  checkLowStock();
+};
+
+// ─── COUPONS ───
+let editingCouponId = null;
+async function loadCoupons() {
+  try {
+    const data = await api('/admin/coupons');
+    const search = (document.getElementById('couponSearch').value || '').toLowerCase();
+    let coupons = data.coupons;
+    if (search) coupons = coupons.filter(c => c.code.toLowerCase().includes(search));
+    if (!coupons.length) { document.getElementById('couponsTable').innerHTML = '<div class="empty-state"><div class="empty-icon">🎟️</div><p>' + t('لا توجد كوبونات','No coupons') + '</p></div>'; return; }
+    document.getElementById('couponsTable').innerHTML = `<div class="table-wrap"><table>
+      <tr><th>#</th><th>${t('الكود','Code')}</th><th>${t('الخصم','Discount')}</th><th>${t('المستخدم','Used')}</th><th>${t('الحد','Max')}</th><th>${t('أقل طلب','Min')}</th><th>${t('الحالة','Status')}</th><th>${t('الانتهاء','Expires')}</th><th></th></tr>
+      ${coupons.map(c => `<tr>
+        <td>${c.id}</td><td style="font-weight:700;font-family:monospace;letter-spacing:1px;color:var(--primary)">${c.code}</td>
+        <td style="font-weight:700;color:var(--success)">${c.discount_percent}%</td>
+        <td>${c.used_count}${c.max_uses > 0 ? '/' + c.max_uses : ''}</td>
+        <td>${c.max_uses > 0 ? c.max_uses : '∞'}</td>
+        <td>${c.min_order > 0 ? c.min_order + ' EGP' : '—'}</td>
+        <td><span class="badge ${c.is_active ? 'delivered' : 'cancelled'}">${c.is_active ? (lang==='ar'?'نشط':'Active') : (lang==='ar'?'معطل':'Inactive')}</span></td>
+        <td style="font-size:12px;color:var(--text2)">${c.expires_at ? new Date(c.expires_at).toLocaleDateString() : '—'}</td>
+        <td>
+          <button class="btn btn-sm btn-outline" onclick="openCouponModal(${c.id})">✏️</button>
+          <button class="btn btn-sm" style="background:var(--danger);color:#fff;padding:4px 10px;border:none;border-radius:6px;cursor:pointer;font-size:12px" onclick="deleteCoupon(${c.id})">🗑️</button>
+        </td>
+      </tr>`).join('')}
+    </table></div>`;
+  } catch(e) { showToast(e.message, 'error'); }
+}
+
+async function openCouponModal(id = null) {
+  editingCouponId = id;
+  document.getElementById('couponModalTitle').textContent = id ? (lang==='ar'?'تعديل الكوبون':'Edit Coupon') : (lang==='ar'?'إضافة كوبون جديد':'Add New Coupon');
+  ['cCode','cDiscount','cMaxUses','cMinOrder','cExpires'].forEach(f => document.getElementById(f).value = '');
+  if (id) {
+    try {
+      const data = await api('/admin/coupons');
+      const c = data.coupons.find(x => x.id === id);
+      if (c) {
+        document.getElementById('cCode').value = c.code;
+        document.getElementById('cDiscount').value = c.discount_percent;
+        document.getElementById('cMaxUses').value = c.max_uses;
+        document.getElementById('cMinOrder').value = c.min_order;
+        document.getElementById('cExpires').value = c.expires_at ? c.expires_at.split('T')[0] : '';
+      }
+    } catch(e) { showToast(e.message, 'error'); }
+  }
+  document.getElementById('couponModal').classList.add('show');
+}
+function closeCouponModal() { document.getElementById('couponModal').classList.remove('show'); editingCouponId = null; }
+
+async function saveCoupon() {
+  const body = {
+    code: document.getElementById('cCode').value,
+    discount_percent: parseFloat(document.getElementById('cDiscount').value),
+    max_uses: parseInt(document.getElementById('cMaxUses').value) || 0,
+    min_order: parseFloat(document.getElementById('cMinOrder').value) || 0,
+    expires_at: document.getElementById('cExpires').value || null
+  };
+  if (!body.code || !body.discount_percent) return showToast(t('الكود ونسبة الخصم مطلوبان','Code and discount required'), 'error');
+  try {
+    if (editingCouponId) {
+      await api('/admin/coupons/' + editingCouponId, { method: 'PUT', body: JSON.stringify(body) });
+      showToast(t('تم التعديل','Updated'));
+    } else {
+      await api('/admin/coupons', { method: 'POST', body: JSON.stringify(body) });
+      showToast(t('تمت الإضافة','Added'));
+    }
+    closeCouponModal(); loadCoupons();
+  } catch(e) { showToast(e.message, 'error'); }
+}
+
+async function deleteCoupon(id) {
+  if (!confirm(t('متأكد من الحذف؟','Delete?'))) return;
+  try { await api('/admin/coupons/' + id, { method: 'DELETE' }); showToast(t('تم الحذف','Deleted')); loadCoupons(); }
+  catch(e) { showToast(e.message, 'error'); }
+}
+
+// ─── SALES CHART ───
+let salesChartInstance = null;
+async function loadSalesData(days = 30) {
+  const canvas = document.getElementById('salesChart');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  // Update button styles
+  document.querySelectorAll('#section-reports .btn-sm').forEach(b => { b.className = 'btn btn-sm btn-outline'; });
+  // Find our 7-day button and highlight it
+  const btns = document.querySelectorAll('#section-reports .btn-sm');
+  if (days === 7 && btns[0]) btns[0].className = 'btn btn-sm';
+  else if (days === 30 && btns[1]) btns[1].className = 'btn btn-sm';
+  else if (days === 90 && btns[2]) btns[2].className = 'btn btn-sm';
+  if (btns[0]) btns[0].style.cssText = days===7?'background:var(--gradient);color:#fff;border:none;padding:6px 16px;border-radius:20px;cursor:pointer;font-family:inherit;font-size:12px':'';
+  if (btns[1]) btns[1].style.cssText = days===30?'background:var(--gradient);color:#fff;border:none;padding:6px 16px;border-radius:20px;cursor:pointer;font-family:inherit;font-size:12px':'';
+  if (btns[2]) btns[2].style.cssText = days===90?'background:var(--gradient);color:#fff;border:none;padding:6px 16px;border-radius:20px;cursor:pointer;font-family:inherit;font-size:12px':'';
+  try {
+    const data = await api('/admin/sales-data?days=' + days);
+    if (salesChartInstance) salesChartInstance.destroy();
+    const isDark = dark;
+    const gridColor = isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.06)';
+    const textColor = isDark ? '#999' : '#888';
+    salesChartInstance = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: data.labels.map(d => { const p = d.split('-'); return p[1]+'/'+p[2]; }),
+        datasets: [{
+          label: lang==='ar'?'الإيرادات اليومية':'Daily Revenue',
+          data: data.data,
+          backgroundColor: 'rgba(139,47,142,0.2)',
+          borderColor: '#8B2F8E',
+          borderWidth: 1,
+          borderRadius: 4,
+        }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { labels: { color: textColor, font: { family: 'Cairo' } } } },
+        scales: {
+          x: { grid: { color: gridColor }, ticks: { color: textColor, font: { size: 10 } } },
+          y: { grid: { color: gridColor }, ticks: { color: textColor, font: { size: 10 }, callback: v => v + ' EGP' } }
+        }
+      }
+    });
+    document.getElementById('salesTotal').textContent = Math.round(data.total).toLocaleString() + ' EGP';
+    document.getElementById('salesAvg').textContent = Math.round(data.total / data.labels.length).toLocaleString() + ' EGP';
+  } catch(e) {
+    document.getElementById('salesChart').parentElement.innerHTML = '<div class="chart-loading">' + t('لا توجد بيانات','No data available') + '</div>';
+  }
+}
+
+// ─── EXPORT ORDERS ───
+async function exportOrders() {
+  try {
+    const res = await fetch(API + '/admin/orders/export', {
+      headers: { ...getHeaders() }
+    });
+    if (!res.ok) throw new Error('Export failed');
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'orders-export-' + new Date().toISOString().split('T')[0] + '.csv';
+    a.click();
+    URL.revokeObjectURL(url);
+    showToast(t('تم التصدير','Exported'));
+  } catch(e) { showToast(e.message, 'error'); }
+}
+
+// ─── PRINT INVOICE ───
+async function printInvoice(id) {
+  try {
+    const o = await api('/admin/orders/' + id);
+    const win = window.open('', '_blank');
+    const items = o.items.map(i => `<tr><td>${i.name_ar || i.name}</td><td>×${i.quantity}</td><td style="text-align:left">${Math.round(i.price)} EGP</td><td style="text-align:left">${Math.round(i.price * i.quantity)} EGP</td></tr>`).join('');
+    win.document.write(`
+      <html dir="${lang==='ar'?'rtl':'ltr'}"><head><meta charset="utf-8"><title>Invoice #${o.id}</title>
+      <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+      <style>
+        body{font-family:'Cairo',sans-serif;padding:40px;color:#222;max-width:700px;margin:0 auto}
+        h1{font-size:24px;color:#8B2F8E;margin:0}
+        .header{display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid #8B2F8E;padding-bottom:16px;margin-bottom:24px}
+        .info{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px;background:#f8f6fa;padding:16px;border-radius:8px}
+        .info div label{font-size:11px;color:#888;text-transform:uppercase}
+        .info div .val{font-weight:600;margin-top:2px}
+        table{width:100%;border-collapse:collapse;margin-bottom:24px}
+        th{background:#8B2F8E;color:#fff;padding:10px 14px;text-align:${lang==='ar'?'right':'left'};font-size:13px}
+        td{padding:10px 14px;border-bottom:1px solid #eee;font-size:13px}
+        .total{text-align:left;font-size:20px;font-weight:800;color:#8B2F8E;border-top:2px solid #8B2F8E;padding-top:12px}
+        .footer{text-align:center;color:#aaa;font-size:12px;margin-top:40px;border-top:1px solid #eee;padding-top:20px}
+      </style></head><body>
+      <div class="header"><h1>✦ GlowRX</h1><div><div style="font-size:11px;color:#888">${t('فاتورة','INVOICE')} #${o.id}</div><div style="font-size:12px;color:#666">${new Date(o.created_at).toLocaleDateString()}</div></div></div>
+      <div class="info">
+        <div><label>${t('العميل','Customer')}</label><div class="val">${o.user_name || 'Guest'}</div></div>
+        <div><label>${t('الهاتف','Phone')}</label><div class="val">${o.phone || o.user_phone || '—'}</div></div>
+        <div><label>${t('العنوان','Address')}</label><div class="val">${o.shipping_address || '—'}</div></div>
+        <div><label>${t('طريقة الدفع','Payment')}</label><div class="val">${o.payment_method} / ${o.payment_status}</div></div>
+      </div>
+      <table><tr><th>${t('المنتج','Item')}</th><th>${t('الكمية','Qty')}</th><th>${t('السعر','Price')}</th><th>${t('الإجمالي','Total')}</th></tr>${items}</table>
+      <div class="total">${t('المجموع','Total')}: ${Math.round(o.total)} EGP</div>
+      <div class="footer">GlowRX — ${t('شكراً لتسوقك معنا','Thank you for shopping with us')}</div>
+      <script>window.print();window.onafterprint=()=>window.close();<\/script>
+    </body></html>`);
+    win.document.close();
+  } catch(e) { showToast(e.message, 'error'); }
+}
 
 // Init
 if (lang === 'en') { document.documentElement.dir = 'ltr'; document.getElementById('langToggle').textContent = 'العربية'; }

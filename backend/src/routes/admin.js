@@ -117,4 +117,101 @@ router.get('/stats', adminAuth, (req, res) => {
   });
 });
 
+// --- Coupons ---
+router.get('/coupons', adminAuth, (req, res) => {
+  const coupons = dbAll('SELECT * FROM coupons ORDER BY created_at DESC');
+  res.json({ coupons });
+});
+
+router.post('/coupons', adminAuth, (req, res) => {
+  const { code, discount_percent, max_uses, min_order, expires_at } = req.body;
+  if (!code || !discount_percent) return res.status(400).json({ error: 'Code and discount percent required' });
+  const existing = dbGet('SELECT id FROM coupons WHERE code = ?', [code]);
+  if (existing) return res.status(400).json({ error: 'Coupon code already exists' });
+  const result = dbRun('INSERT INTO coupons (code, discount_percent, max_uses, min_order, expires_at) VALUES (?,?,?,?,?)',
+    [code.toUpperCase(), discount_percent, max_uses || 0, min_order || 0, expires_at || null]);
+  res.json({ id: result.lastInsertRowid, message: 'Coupon created' });
+});
+
+router.put('/coupons/:id', adminAuth, (req, res) => {
+  const { discount_percent, max_uses, min_order, is_active, expires_at } = req.body;
+  const existing = dbGet('SELECT * FROM coupons WHERE id = ?', [req.params.id]);
+  if (!existing) return res.status(404).json({ error: 'Coupon not found' });
+  dbRun('UPDATE coupons SET discount_percent=?, max_uses=?, min_order=?, is_active=?, expires_at=? WHERE id=?',
+    [discount_percent !== undefined ? discount_percent : existing.discount_percent,
+     max_uses !== undefined ? max_uses : existing.max_uses,
+     min_order !== undefined ? min_order : existing.min_order,
+     is_active !== undefined ? (is_active ? 1 : 0) : existing.is_active,
+     expires_at !== undefined ? expires_at : existing.expires_at, req.params.id]);
+  res.json({ message: 'Coupon updated' });
+});
+
+router.delete('/coupons/:id', adminAuth, (req, res) => {
+  dbRun('DELETE FROM coupons WHERE id = ?', [req.params.id]);
+  res.json({ message: 'Coupon deleted' });
+});
+
+// Validate coupon (public, no auth needed)
+router.post('/coupons/validate', (req, res) => {
+  const { code, order_total } = req.body;
+  if (!code) return res.status(400).json({ error: 'Code required' });
+  const coupon = dbGet('SELECT * FROM coupons WHERE code = ? AND is_active = 1', [code.toUpperCase()]);
+  if (!coupon) return res.status(404).json({ error: 'Invalid coupon code', valid: false });
+  if (coupon.max_uses > 0 && coupon.used_count >= coupon.max_uses) return res.json({ valid: false, error: 'Coupon usage limit reached' });
+  if (coupon.expires_at && new Date(coupon.expires_at) < new Date()) return res.json({ valid: false, error: 'Coupon has expired' });
+  if (order_total && order_total < coupon.min_order) return res.json({ valid: false, error: 'Minimum order of ' + coupon.min_order + ' required' });
+  res.json({ valid: true, discount_percent: coupon.discount_percent, code: coupon.code });
+});
+
+// Track coupon usage
+router.post('/coupons/use', adminAuth, (req, res) => {
+  const { code } = req.body;
+  if (!code) return res.status(400).json({ error: 'Code required' });
+  const coupon = dbGet('SELECT * FROM coupons WHERE code = ?', [code.toUpperCase()]);
+  if (!coupon) return res.status(404).json({ error: 'Coupon not found' });
+  dbRun('UPDATE coupons SET used_count = used_count + 1 WHERE id = ?', [coupon.id]);
+  res.json({ message: 'Coupon used' });
+});
+
+// --- Sales Data (for charts) ---
+router.get('/sales-data', adminAuth, (req, res) => {
+  const days = parseInt(req.query.days) || 30;
+  const orders = dbAll("SELECT id, total, status, created_at FROM orders WHERE status != 'cancelled' ORDER BY created_at ASC");
+  const salesByDay = {};
+  const now = new Date();
+  for (let i = days - 1; i >= 0; i--) {
+    const d = new Date(now); d.setDate(d.getDate() - i);
+    const key = d.toISOString().split('T')[0];
+    salesByDay[key] = 0;
+  }
+  orders.forEach(o => {
+    const day = o.created_at.split('T')[0];
+    if (salesByDay[day] !== undefined) salesByDay[day] += o.total;
+  });
+  const labels = Object.keys(salesByDay);
+  const data = Object.values(salesByDay);
+  res.json({ labels, data, total: data.reduce((a,b) => a+b, 0) });
+});
+
+// --- Low Stock ---
+router.get('/low-stock', adminAuth, (req, res) => {
+  const threshold = parseInt(req.query.threshold) || 10;
+  const products = dbAll('SELECT p.*, c.name_ar as category_ar, c.name_en as category_en FROM products p LEFT JOIN categories c ON p.category_id = c.id WHERE p.stock <= ? ORDER BY p.stock ASC', [threshold]);
+  res.json({ products, threshold });
+});
+
+// --- Export Orders CSV ---
+router.get('/orders/export', adminAuth, (req, res) => {
+  const orders = dbAll("SELECT o.*, u.name as user_name, u.email as user_email, u.phone as user_phone FROM orders o LEFT JOIN users u ON o.user_id = u.id ORDER BY o.created_at DESC");
+  const rows = orders.map(o => {
+    const items = JSON.parse(o.items || '[]');
+    const itemNames = items.map(i => (i.name_ar || i.name) + ' x' + i.quantity).join('; ');
+    return `${o.id},${o.user_name || 'Guest'},${o.user_email || ''},${o.phone || o.user_phone || ''},${o.shipping_address || ''},${o.total},${o.status},${o.payment_method},${o.payment_status},"${itemNames}",${o.created_at}`;
+  });
+  const header = 'ID,Customer,Email,Phone,Address,Total,Status,Payment Method,Payment Status,Items,Date';
+  res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+  res.setHeader('Content-Disposition', 'attachment; filename=orders-export.csv');
+  res.send('\uFEFF' + header + '\n' + rows.join('\n'));
+});
+
 module.exports = router;
