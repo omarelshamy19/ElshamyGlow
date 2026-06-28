@@ -38,7 +38,7 @@ app.on('ready', () => {
 });
 
 // IPC handler for admin credentials
-const { ipcMain, dialog } = require('electron');
+const { ipcMain } = require('electron');
 ipcMain.on('save-admin-creds', (event, creds) => {
   try {
     const fs = require('fs');
