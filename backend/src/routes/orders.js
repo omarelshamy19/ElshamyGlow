@@ -3,7 +3,7 @@ const jwt = require('jsonwebtoken');
 const { dbAll, dbGet, dbRun } = require('../db.js');
 
 const router = Router();
-const JWT_SECRET = process.env.JWT_SECRET || 'cosmetics-store-secret-key';
+const JWT_SECRET = process.env.JWT_SECRET || 'fallback-change-me';
 
 router.post('/', (req, res) => {
   const { items, total, payment_method, shipping_address, phone, notes, coupon_code } = req.body;
