@@ -1627,7 +1627,9 @@ window.addEventListener('scroll', () => {
 async function fetchData() {
   document.getElementById('productsSkeleton').style.display = 'grid';
   try {
-    const res = await fetch(`${API_URL}/products`);
+    const ctrl = new AbortController(); setTimeout(() => ctrl.abort(), 10000);
+    const res = await fetch(`${API_URL}/products`, { signal: ctrl.signal });
+    if (!res.ok) throw new Error('API error');
     const data = await res.json();
     products = data.products || [];
     categories = data.categories || [];
@@ -1644,6 +1646,8 @@ async function fetchData() {
     });
   } catch (e) {
     console.error('API failed, using fallback data');
+    if (e.name === 'AbortError') showToast(currentLang==='ar'?'تعذر الاتصال بالخادم، تم تحميل بيانات مؤقتة':'Server unreachable, using offline data','info');
+    else showToast(currentLang==='ar'?'تم تحميل بيانات مؤقتة بسبب مشكلة في الاتصال':'Using offline data due to connection issue','info');
     loadFallbackData();
   } finally {
     document.getElementById('productsSkeleton').style.display = 'none';
@@ -1887,15 +1891,24 @@ function renderCheckoutSummary() {
   c.innerHTML=cart.map(i=>`<div class="checkout-summary-item"><span>${currentLang==='ar'?i.name_ar:i.name_en} × ${i.qty}</span><span>${i.price*i.qty} EGP</span></div>`).join('');
   document.getElementById('coTotal').textContent=`${getCartTotal()} EGP`;
 }
+let ordering = false;
 async function placeOrder() {
+  if (ordering) return;
   const name=document.getElementById('coName').value, phone=document.getElementById('coPhone').value, address=document.getElementById('coAddress').value, notes=document.getElementById('coNotes').value;
   if(!name||!phone||!address){showToast(currentLang==='ar'?'يرجى ملء جميع الحقول المطلوبة':'Please fill all required fields','error');return;}
+  ordering = true;
+  const btn = document.getElementById('placeOrderBtn');
+  if (btn) { btn.disabled = true; btn.textContent = currentLang === 'ar' ? 'جاري الإرسال...' : 'Placing...'; }
   try {
+    const ctrl = new AbortController(); setTimeout(() => ctrl.abort(), 15000);
     const headers={'Content-Type':'application/json'}; if(token) headers['Authorization']=`Bearer ${token}`;
-    const res=await fetch(`${API_URL}/orders`,{method:'POST',headers,body:JSON.stringify({items:cart.map(i=>({id:i.id,name_ar:i.name_ar,name_en:i.name_en,price:i.price,qty:i.qty})),total:getCartTotal(),payment_method:'cash_on_delivery',shipping_address:address,phone,notes})});
-    const data=await res.json(); if(!res.ok) throw new Error(data.error);
+    const res=await fetch(`${API_URL}/orders`,{method:'POST',signal:ctrl.signal,headers,body:JSON.stringify({items:cart.map(i=>({id:i.id,name_ar:i.name_ar,name_en:i.name_en,price:i.price,qty:i.qty})),total:getCartTotal(),payment_method:'cash_on_delivery',shipping_address:address,phone,notes})});
+    const data=await res.json(); if(!res.ok) throw new Error(data.error||'Order failed');
     cart=[]; updateCartUI(); hideCheckout(); showToast(currentLang==='ar'?`تم تأكيد الطلب رقم #${data.id} ✓`:`Order #${data.id} confirmed ✓`,'success');
-  } catch(e) { showToast(e.message||(currentLang==='ar'?'فشل إتمام الطلب':'Order failed'),'error'); }
+  } catch(e) {
+    if (e.name === 'AbortError') showToast(currentLang==='ar'?'انقطع الاتصال بالخادم، حاول مرة أخرى':'Connection timed out','error');
+    else showToast(e.message||(currentLang==='ar'?'فشل إتمام الطلب':'Order failed'),'error');
+  } finally { ordering = false; if (btn) { btn.disabled = false; btn.textContent = i18n[currentLang].placeOrderBtn; } }
 }
 
 function showToast(msg,type='success') {
