@@ -1,7 +1,7 @@
 const { app, BrowserWindow, Tray, Menu, Notification, nativeImage, dialog, shell } = require('electron');
 const path = require('path');
 
-const ADMIN_URL = 'https://cosmetics-store-api.vercel.app/admin';
+const ADMIN_URL = `file://${path.join(__dirname, 'admin.html')}`;
 
 let mainWindow = null;
 let tray = null;
