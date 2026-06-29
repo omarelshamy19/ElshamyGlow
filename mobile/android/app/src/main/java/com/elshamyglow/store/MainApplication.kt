@@ -1,4 +1,4 @@
-package com.cosmetics.store
+package com.elshamyglow.store
 
 import android.app.Application
 import android.content.res.Configuration
