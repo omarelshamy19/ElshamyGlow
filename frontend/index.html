@@ -37,6 +37,16 @@
   --radius-lg:20px;
   --transition:all 0.3s ease;
 }
+.dark{
+  --bg:#121212;
+  --white:#1E1E1E;
+  --text:#E0E0E0;
+  --text-light:#999;
+  --gray:#2A2A2A;
+  --gray-dark:#555;
+  --shadow:0 2px 12px rgba(0,0,0,0.3);
+  --shadow-hover:0 8px 30px rgba(0,0,0,0.5);
+}
 html{scroll-behavior:smooth}
 body{
   font-family:'Cairo',sans-serif;
@@ -862,6 +872,7 @@ img{max-width:100%;display:block}
   </nav>
   <div class="header-actions">
     <button class="header-btn" onclick="toggleSearch()"><i class="fas fa-search"></i></button>
+    <button class="header-btn" id="darkToggle" onclick="toggleDark()"><i class="fas fa-moon"></i></button>
     <button class="header-btn" onclick="toggleLogin()" id="headerUserBtn"><i class="fas fa-user"></i></button>
     <button class="header-btn" onclick="toggleCart()"><i class="fas fa-shopping-bag"></i><span class="cart-badge" id="cartBadge">0</span></button>
   </div>
@@ -1528,6 +1539,17 @@ function toast(msg, type = ''){
 
 /* ═══ SEARCH ═══ */
 let searchTimer;
+function toggleDark(){
+  document.body.classList.toggle('dark');
+  const icon = document.querySelector('#darkToggle i');
+  if(document.body.classList.contains('dark')){
+    icon.className = 'fas fa-sun';
+    localStorage.setItem('elshamyglow_dark', '1');
+  } else {
+    icon.className = 'fas fa-moon';
+    localStorage.setItem('elshamyglow_dark', '');
+  }
+}
 function toggleSearch(){
   const o = document.getElementById('searchOverlay');
   o.classList.toggle('open');
@@ -1877,6 +1899,10 @@ window.addEventListener('scroll', () => {
   document.getElementById('header').classList.toggle('scrolled', window.scrollY > 50);
 });
 
+if(localStorage.getItem('elshamyglow_dark') === '1'){
+  document.body.classList.add('dark');
+  document.querySelector('#darkToggle i').className = 'fas fa-sun';
+}
 init().then(function() {
   navigate(window.location.hash.replace('#', '') || 'home');
 });
