@@ -7,5 +7,16 @@
   "routes": [
     { "src": "/api/(.*)", "dest": "backend/src/index.js" },
     { "src": "/(.*)", "dest": "backend/public/$1" }
+  ],
+  "headers": [
+    {
+      "source": "/sitemap.xml",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "application/xml; charset=utf-8"
+        }
+      ]
+    }
   ]
 }
