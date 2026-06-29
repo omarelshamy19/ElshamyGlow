@@ -82,9 +82,9 @@ router.post('/send-verification', async (req, res) => {
         });
         await transporter.sendMail({
           from: process.env.SMTP_FROM || process.env.SMTP_USER,
-          to: user.email, subject: 'GlowRX - Verification Code',
+          to: user.email, subject: 'ElshamyGlow - Verification Code',
           text: 'Your verification code is: ' + code,
-          html: '<h2>GlowRX</h2><p>Your verification code is: <strong>' + code + '</strong></p>'
+          html: '<h2>ElshamyGlow</h2><p>Your verification code is: <strong>' + code + '</strong></p>'
         });
         return res.json({ message: 'Verification code sent to your email' });
       } catch(e) {
@@ -176,7 +176,7 @@ router.get('/test-email', async (req, res) => {
     });
     const info = await transporter.sendMail({
       from: process.env.SMTP_FROM || process.env.SMTP_USER,
-      to, subject: 'GlowRX SMTP Test', text: 'If you receive this, SMTP is working!'
+      to, subject: 'ElshamyGlow SMTP Test', text: 'If you receive this, SMTP is working!'
     });
     res.json({ status: 'OK', messageId: info.messageId });
   } catch(e) {
