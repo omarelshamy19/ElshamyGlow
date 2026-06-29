@@ -739,6 +739,16 @@ img{max-width:100%;display:block}
   color:rgba(255,255,255,0.4);
 }
 
+/* ═══ PAGE NAVIGATION ═══ */
+.page-section, .home-only {
+  transition: opacity 0.35s ease, visibility 0.35s ease;
+}
+.page-section.hidden, .home-only.hidden {
+  display: none;
+  overflow: hidden;
+  clip: rect(0,0,0,0);
+}
+
 /* ═══ RESPONSIVE ═══ */
 @media(max-width:1024px){
   .nav{display:none}
@@ -786,48 +796,48 @@ img{max-width:100%;display:block}
   <button class="mobile-menu-btn" onclick="toggleMobileNav()"><i class="fas fa-bars"></i></button>
   <a href="#" class="header-logo">ElShamy<span>Glow</span></a>
   <nav class="nav" id="nav">
-    <a href="#" class="nav-item active">Home</a>
-    <a href="#" class="nav-item">Shop All</a>
-    <a href="#" class="nav-item">New Arrivals</a>
+    <a href="#home" class="nav-item active" onclick="navigate('home')">Home</a>
+    <a href="#categories" class="nav-item" onclick="navigate('categories')">Shop All</a>
+    <a href="#deals" class="nav-item" onclick="navigate('deals')">New Arrivals</a>
     <div class="nav-item">
       Bundles <i class="fas fa-chevron-down" style="font-size:10px;margin-left:4px"></i>
       <div class="nav-dropdown">
-        <a href="#">All Bundles</a>
-        <a href="#">Hair Care Bundles</a>
-        <a href="#">Skincare Bundles</a>
-        <a href="#">Bridal Bundles</a>
+        <a href="#bundles" onclick="navigate('bundles')">All Bundles</a>
+        <a href="#bundles" onclick="navigate('bundles')">Hair Care Bundles</a>
+        <a href="#bundles" onclick="navigate('bundles')">Skincare Bundles</a>
+        <a href="#bridal" onclick="navigate('bridal')">Bridal Bundles</a>
       </div>
     </div>
     <div class="nav-item">
       Beauty &amp; Makeup <i class="fas fa-chevron-down" style="font-size:10px;margin-left:4px"></i>
       <div class="nav-dropdown">
-        <a href="#">All</a>
-        <a href="#">Lipstick</a>
-        <a href="#">Creamy Tint &amp; Blusher</a>
-        <a href="#">Lip Care</a>
+        <a href="#categories" onclick="navigate('categories')">All</a>
+        <a href="#categories" onclick="navigate('categories')">Lipstick</a>
+        <a href="#categories" onclick="navigate('categories')">Creamy Tint &amp; Blusher</a>
+        <a href="#categories" onclick="navigate('categories')">Lip Care</a>
       </div>
     </div>
     <div class="nav-item">
       Hair Care <i class="fas fa-chevron-down" style="font-size:10px;margin-left:4px"></i>
       <div class="nav-dropdown">
-        <a href="#">All</a>
-        <a href="#">Shower Routine</a>
-        <a href="#">Hair Oils</a>
-        <a href="#">Hair Serum</a>
-        <a href="#">Satin</a>
-        <a href="#">Henna</a>
+        <a href="#categories" onclick="navigate('categories')">All</a>
+        <a href="#categories" onclick="navigate('categories')">Shower Routine</a>
+        <a href="#categories" onclick="navigate('categories')">Hair Oils</a>
+        <a href="#categories" onclick="navigate('categories')">Hair Serum</a>
+        <a href="#categories" onclick="navigate('categories')">Satin</a>
+        <a href="#categories" onclick="navigate('categories')">Henna</a>
       </div>
     </div>
     <div class="nav-item">
       Skincare <i class="fas fa-chevron-down" style="font-size:10px;margin-left:4px"></i>
       <div class="nav-dropdown">
-        <a href="#">All</a>
-        <a href="#">Face Soap</a>
-        <a href="#">Night Cream</a>
-        <a href="#">Face Serum</a>
+        <a href="#categories" onclick="navigate('categories')">All</a>
+        <a href="#categories" onclick="navigate('categories')">Face Soap</a>
+        <a href="#categories" onclick="navigate('categories')">Night Cream</a>
+        <a href="#categories" onclick="navigate('categories')">Face Serum</a>
       </div>
     </div>
-    <a href="#" class="nav-item">Body Care</a>
+    <a href="#categories" class="nav-item" onclick="navigate('categories')">Body Care</a>
   </nav>
   <div class="header-actions">
     <button class="header-btn" onclick="toggleSearch()"><i class="fas fa-search"></i></button>
@@ -840,74 +850,84 @@ img{max-width:100%;display:block}
 <div class="mobile-nav-overlay" id="mobileNavOverlay" onclick="toggleMobileNav()"></div>
 <div class="mobile-nav" id="mobileNav">
   <button class="close-btn" onclick="toggleMobileNav()"><i class="fas fa-times"></i></button>
-  <a href="#" onclick="toggleMobileNav()">Home</a>
-  <a href="#" onclick="toggleMobileNav()">Shop All</a>
-  <a href="#" onclick="toggleMobileNav()">New Arrivals</a>
-  <a href="#" onclick="toggleMobileNav()">Bundles</a>
-  <a href="#" onclick="toggleMobileNav()">Beauty &amp; Makeup</a>
-  <a href="#" onclick="toggleMobileNav()">Hair Care</a>
-  <a href="#" onclick="toggleMobileNav()">Skincare</a>
-  <a href="#" onclick="toggleMobileNav()">Body Care</a>
+  <a href="#home" onclick="toggleMobileNav();navigate('home')">Home</a>
+  <a href="#categories" onclick="toggleMobileNav();navigate('categories')">Shop All</a>
+  <a href="#deals" onclick="toggleMobileNav();navigate('deals')">New Arrivals</a>
+  <a href="#bundles" onclick="toggleMobileNav();navigate('bundles')">Bundles</a>
+  <a href="#categories" onclick="toggleMobileNav();navigate('categories')">Beauty &amp; Makeup</a>
+  <a href="#categories" onclick="toggleMobileNav();navigate('categories')">Hair Care</a>
+  <a href="#categories" onclick="toggleMobileNav();navigate('categories')">Skincare</a>
+  <a href="#categories" onclick="toggleMobileNav();navigate('categories')">Body Care</a>
 </div>
 <div class="cart-overlay" id="cartOverlay" onclick="toggleCart()"></div>
 
-<!-- ═══ HERO ═══ -->
-<section class="hero">
+<!-- ═══ PAGE: HOME (extra content only visible on home) ═══ -->
+<section class="hero home-only">
   <div class="hero-content">
     <div class="hero-badge"><i class="fas fa-tag"></i> Up to 40% OFF</div>
     <h1>Your Favorite Brands.<br>Unbeatable Prices.</h1>
     <p>Shop L'Oréal, Maybelline, Nivea &amp; more — all at ElShamyGlow prices</p>
     <div class="hero-btns">
       <button class="btn btn-primary" onclick="alert('Shop!')"><i class="fas fa-shopping-bag"></i> Shop Now</button>
-      <button class="btn btn-outline" onclick="document.getElementById('deals').scrollIntoView({behavior:'smooth'})">View Deals</button>
+      <button class="btn btn-outline" onclick="navigate('deals')">View Deals</button>
     </div>
   </div>
 </section>
 
 <!-- ═══ TRUST BADGES ═══ -->
-<div class="trust-strip">
+<div class="trust-strip home-only">
   <div class="trust-item"><span class="trust-icon">✅</span><span class="trust-text">100% Authentic Products</span></div>
   <div class="trust-item"><span class="trust-icon">🚚</span><span class="trust-text">Fast Delivery Across Egypt</span></div>
   <div class="trust-item"><span class="trust-icon">💰</span><span class="trust-text">Lowest Price Guaranteed</span></div>
   <div class="trust-item"><span class="trust-icon">🔄</span><span class="trust-text">Easy Returns</span></div>
 </div>
 
-<!-- ═══ FLASH DEALS ═══ -->
-<section class="section" id="deals">
-  <div class="section-title">🔥 Today's Best Deals <span class="see-all">See All →</span></div>
-  <div class="scroll-grid" id="flashDealsGrid"></div>
-</section>
+<!-- ═══ PAGE: FLASH DEALS ═══ -->
+<div class="page-section" id="page-deals" data-page="deals">
+  <section class="section" id="deals">
+    <div class="section-title">🔥 Today's Best Deals <span class="see-all" onclick="navigate('deals')">See All →</span></div>
+    <div class="scroll-grid" id="flashDealsGrid"></div>
+  </section>
+</div>
 
-<!-- ═══ BRIDAL COLLECTION ═══ -->
-<section class="bridal">
-  <div class="section" style="background:transparent;padding:0">
-    <div class="section-title">Bridal Collection 💍 <span class="see-all">See All →</span></div>
-    <div class="scroll-grid" id="bridalGrid"></div>
-  </div>
-</section>
+<!-- ═══ PAGE: BRIDAL COLLECTION ═══ -->
+<div class="page-section" id="page-bridal" data-page="bridal">
+  <section class="bridal">
+    <div class="section" style="background:transparent;padding:0">
+      <div class="section-title">Bridal Collection 💍 <span class="see-all" onclick="navigate('bridal')">See All →</span></div>
+      <div class="scroll-grid" id="bridalGrid"></div>
+    </div>
+  </section>
+</div>
 
-<!-- ═══ FEATURED PRODUCT ═══ -->
-<section class="section">
-  <div class="section-title">Featured Product ⭐</div>
-  <div class="featured" id="featuredProduct"></div>
-</section>
+<!-- ═══ PAGE: FEATURED PRODUCT ═══ -->
+<div class="page-section" id="page-featured" data-page="featured">
+  <section class="section">
+    <div class="section-title">Featured Product ⭐</div>
+    <div class="featured" id="featuredProduct"></div>
+  </section>
+</div>
 
-<!-- ═══ BUNDLE UP ═══ -->
-<section class="section" style="background:var(--gray);border-radius:0;max-width:100%;padding:60px 24px">
-  <div style="max-width:1200px;margin:0 auto">
-    <div class="section-title">Bundle Up &amp; Save More! 💝</div>
-    <div class="scroll-grid" id="bundleGrid"></div>
-  </div>
-</section>
+<!-- ═══ PAGE: BUNDLE UP ═══ -->
+<div class="page-section" id="page-bundles" data-page="bundles">
+  <section class="section" style="background:var(--gray);border-radius:0;max-width:100%;padding:60px 24px">
+    <div style="max-width:1200px;margin:0 auto">
+      <div class="section-title">Bundle Up &amp; Save More! 💝 <span class="see-all" onclick="navigate('bundles')">See All →</span></div>
+      <div class="scroll-grid" id="bundleGrid"></div>
+    </div>
+  </section>
+</div>
 
-<!-- ═══ SHOP BY CATEGORY ═══ -->
-<section class="section">
-  <div class="section-title">Shop by Category <span class="see-all">See All →</span></div>
-  <div class="grid-4" id="categoryGrid"></div>
-</section>
+<!-- ═══ PAGE: SHOP BY CATEGORY ═══ -->
+<div class="page-section" id="page-categories" data-page="categories">
+  <section class="section">
+    <div class="section-title">Shop by Category <span class="see-all" onclick="navigate('categories')">See All →</span></div>
+    <div class="grid-4" id="categoryGrid"></div>
+  </section>
+</div>
 
 <!-- ═══ WHY US ═══ -->
-<section class="section">
+<section class="section home-only">
   <div class="section-title">Why Shop With Us?</div>
   <div class="why-grid">
     <div class="why-card">
@@ -929,7 +949,7 @@ img{max-width:100%;display:block}
 </section>
 
 <!-- ═══ SUBSCRIBE ═══ -->
-<section class="subscribe">
+<section class="subscribe home-only">
   <h2>Get Exclusive Deals First!</h2>
   <p>Subscribe and be the first to know about flash sales and new arrivals.</p>
   <div class="subscribe-form">
@@ -1630,12 +1650,35 @@ function subscribe(){
   }
 }
 
+/* ═══ PAGE ROUTER ═══ */
+function navigate(page) {
+  if (!page || page === 'home') {
+    window.location.hash = '';
+    document.querySelectorAll('.page-section, .home-only').forEach(el => el.classList.remove('hidden'));
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    document.querySelector('.nav-item[href="#home"]')?.classList.add('active');
+    return;
+  }
+  window.location.hash = page;
+  document.querySelectorAll('.page-section, .home-only').forEach(el => el.classList.add('hidden'));
+  const target = document.getElementById('page-' + page);
+  if (target) { target.classList.remove('hidden'); }
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.querySelector('.nav-item[href="#' + page + '"]')?.classList.add('active');
+}
+
+window.addEventListener('hashchange', () => {
+  const hash = window.location.hash.replace('#', '');
+  navigate(hash || 'home');
+});
+
 // Header scroll
 window.addEventListener('scroll', () => {
   document.getElementById('header').classList.toggle('scrolled', window.scrollY > 50);
 });
 
 init();
+setTimeout(() => navigate(window.location.hash.replace('#', '') || 'home'), 100);
 </script>
 </body>
 </html>
