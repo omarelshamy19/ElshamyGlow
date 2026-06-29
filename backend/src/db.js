@@ -77,7 +77,14 @@ async function initDb() {
     const colNames = (cols?.rows || []).map(r => r[1]?.value);
     if (name === 'products' && !colNames.includes('sku')) await query('ALTER TABLE products ADD COLUMN sku TEXT');
     if (name === 'products' && !colNames.includes('variants')) await query("ALTER TABLE products ADD COLUMN variants TEXT DEFAULT '[]'");
-    if (name === 'products' && !colNames.includes('tag')) await query("ALTER TABLE products ADD COLUMN tag TEXT DEFAULT ''");
+    if (name === 'products' && !colNames.includes('tag')) {
+      await query("ALTER TABLE products ADD COLUMN tag TEXT DEFAULT ''");
+      // Tag existing products so they appear in sections
+      await query("UPDATE products SET tag = 'flash_deal' WHERE id IN (SELECT id FROM products ORDER BY id LIMIT 8) AND (tag IS NULL OR tag = '')");
+      await query("UPDATE products SET tag = 'featured' WHERE id IN (SELECT id FROM products ORDER BY id LIMIT 5 OFFSET 8) AND (tag IS NULL OR tag = '')");
+      await query("UPDATE products SET tag = 'bridal' WHERE id IN (SELECT id FROM products ORDER BY id LIMIT 2 OFFSET 13) AND (tag IS NULL OR tag = '')");
+      await query("UPDATE products SET tag = 'bundle' WHERE id IN (SELECT id FROM products ORDER BY id LIMIT 4 OFFSET 15) AND (tag IS NULL OR tag = '')");
+    }
     if (name === 'orders' && !colNames.includes('internal_notes')) await query('ALTER TABLE orders ADD COLUMN internal_notes TEXT');
     if (name === 'orders' && !colNames.includes('status_history')) await query("ALTER TABLE orders ADD COLUMN status_history TEXT DEFAULT '[]'");
     if (name === 'orders' && !colNames.includes('estimated_delivery')) await query('ALTER TABLE orders ADD COLUMN estimated_delivery TEXT');
