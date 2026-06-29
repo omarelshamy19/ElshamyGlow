@@ -783,6 +783,24 @@ img{max-width:100%;display:block}
   .sidebar-inner.open{display:block}
 }
 
+/* ═══ WHATSAPP FLOATING BUTTON ═══ */
+.whatsapp-btn{position:fixed;bottom:20px;right:20px;z-index:999;width:56px;height:56px;background:#25D366;color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:28px;box-shadow:0 4px 15px rgba(37,211,102,0.4);transition:var(--transition);animation:wppPulse 2s infinite}
+.whatsapp-btn:hover{transform:scale(1.1);box-shadow:0 6px 20px rgba(37,211,102,0.6)}
+@keyframes wppPulse{0%{box-shadow:0 4px 15px rgba(37,211,102,0.4)}50%{box-shadow:0 4px 25px rgba(37,211,102,0.7)}100%{box-shadow:0 4px 15px rgba(37,211,102,0.4)}}
+
+/* ═══ LOADING SPINNER ═══ */
+.spinner{display:flex;justify-content:center;padding:60px 0;grid-column:1/-1}
+.spinner::after{content:'';width:40px;height:40px;border:4px solid var(--gray);border-top-color:var(--rose);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ═══ STOCK COUNTER ═══ */
+.stock-low{font-size:11px;color:var(--sale);font-weight:600;margin-top:4px}
+
+/* ═══ WISHLIST ═══ */
+.wishlist-btn{position:absolute;top:8px;right:8px;background:rgba(255,255,255,0.9);border:none;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:15px;color:#ccc;transition:var(--transition);z-index:2}
+.wishlist-btn.active{color:var(--sale)}
+.wishlist-btn:hover{transform:scale(1.15)}
+
 /* ═══ RESPONSIVE ═══ */
 @media(max-width:1024px){
   .nav{display:none}
@@ -1246,11 +1264,15 @@ function renderProdCard(p){
   const soldOutHtml = soldOut ? '<div class="prod-sold-out">SOLD OUT</div>' : '';
   const safeName = name.replace(/'/g,"\\'");
   const safeId = p.id || 0;
+  const isWished = wishlist.some(w => w.id === p.id);
+  const wishIcon = isWished ? 'fas' : 'far';
+  const stockHtml = (p.stock !== undefined && p.stock !== null && p.stock < 10) ? '<div class="stock-low">Only ' + p.stock + ' left!</div>' : '';
   return `<div class="prod-card">
-    <div class="prod-img-wrap">${soldOutHtml}<img src="${img}" alt="${name}" loading="lazy" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect fill=%22%23f0f0f0%22 width=%22100%22 height=%22100%22/><text x=%2250%22 y=%2255%22 text-anchor=%22middle%22 fill=%22%23999%22 font-size=%2230%22>📦</text></svg>'"></div>
+    <div class="prod-img-wrap">${soldOutHtml}<button class="wishlist-btn ${wishIcon} fa-heart active" data-id="${p.id}" onclick="event.stopPropagation();toggleWishlist(${p.id},'${(p.name_en||'').replace(/'/g,"\\'")}',${p.price||0},'${img}')"></button><img src="${img}" alt="${name}" loading="lazy" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect fill=%22%23f0f0f0%22 width=%22100%22 height=%22100%22/><text x=%2250%22 y=%2255%22 text-anchor=%22middle%22 fill=%22%23999%22 font-size=%2230%22>📦</text></svg>'"></div>
     <div class="prod-info">
       <div class="prod-name">${name}</div>
       <div class="prod-price"><span class="sale">${price ? price.toLocaleString()+' EGP' : ''}</span></div>
+      ${stockHtml}
       ${!soldOut && price ? `<button class="add-cart" onclick="addToCart({id:${safeId},name:'${safeName}',price:${price},img:'${img}'})">Add to Cart</button>` : ''}
     </div>
   </div>`;
@@ -1423,6 +1445,7 @@ async function init(){
 
 
     loadCart();
+    updateWishlistIcons();
   } catch(e){
     console.error('Failed to load products:', e);
   }
@@ -1837,6 +1860,25 @@ function subscribe(){
   }
 }
 
+/* ═══ WISHLIST ═══ */
+let wishlist = JSON.parse(localStorage.getItem('elshamyglow_wishlist') || '[]');
+
+function toggleWishlist(productId, name, price, img){
+  const idx = wishlist.findIndex(w => w.id === productId);
+  if(idx > -1){ wishlist.splice(idx, 1); } 
+  else { wishlist.push({id: productId, name, price, img}); }
+  localStorage.setItem('elshamyglow_wishlist', JSON.stringify(wishlist));
+  updateWishlistIcons();
+}
+
+function updateWishlistIcons(){
+  document.querySelectorAll('.wishlist-btn').forEach(btn => {
+    const id = parseInt(btn.getAttribute('data-id'));
+    if(wishlist.some(w => w.id === id)) btn.classList.add('active');
+    else btn.classList.remove('active');
+  });
+}
+
 /* ═══ PAGE ROUTER ═══ */
 function navigate(page) {
   if (!page || page === 'home') {
@@ -1906,5 +1948,6 @@ init().then(function() {
   navigate(window.location.hash.replace('#', '') || 'home');
 });
 </script>
+<a href="https://wa.me/201234567890?text=Hi%20ElShamyGlow!" target="_blank" rel="noopener" class="whatsapp-btn" aria-label="Chat on WhatsApp"><i class="fab fa-whatsapp"></i></a>
 </body>
 </html>
