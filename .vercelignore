@@ -1,0 +1,4 @@
+mobile/assets/*.apk
+desktop/dist
+node_modules
+.git

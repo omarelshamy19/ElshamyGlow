@@ -10,3 +10,4 @@ mobile/android/.idea/
 mobile/node_modules/
 mobile/.expo/
 __pycache__/
+.vercel
