@@ -79,11 +79,16 @@ async function initDb() {
     if (name === 'products' && !colNames.includes('variants')) await query("ALTER TABLE products ADD COLUMN variants TEXT DEFAULT '[]'");
     if (name === 'products' && !colNames.includes('tag')) {
       await query("ALTER TABLE products ADD COLUMN tag TEXT DEFAULT ''");
-      // Tag existing products so they appear in sections
-      await query("UPDATE products SET tag = 'flash_deal' WHERE id IN (SELECT id FROM products ORDER BY id LIMIT 8) AND (tag IS NULL OR tag = '')");
-      await query("UPDATE products SET tag = 'featured' WHERE id IN (SELECT id FROM products ORDER BY id LIMIT 5 OFFSET 8) AND (tag IS NULL OR tag = '')");
-      await query("UPDATE products SET tag = 'bridal' WHERE id IN (SELECT id FROM products ORDER BY id LIMIT 2 OFFSET 13) AND (tag IS NULL OR tag = '')");
-      await query("UPDATE products SET tag = 'bundle' WHERE id IN (SELECT id FROM products ORDER BY id LIMIT 4 OFFSET 15) AND (tag IS NULL OR tag = '')");
+    }
+    // Tag products that don't have a tag yet
+    if (name === 'products') {
+      const untagged = await query("SELECT COUNT(*) as c FROM products WHERE tag IS NULL OR tag = ''");
+      if (untagged?.rows?.[0]?.[0]?.value > 0) {
+        await query("UPDATE products SET tag = 'flash_deal' WHERE id IN (SELECT id FROM products WHERE tag IS NULL OR tag = '' ORDER BY id LIMIT 8)");
+        await query("UPDATE products SET tag = 'featured' WHERE id IN (SELECT id FROM products WHERE tag IS NULL OR tag = '' ORDER BY id LIMIT 5 OFFSET 8)");
+        await query("UPDATE products SET tag = 'bridal' WHERE id IN (SELECT id FROM products WHERE tag IS NULL OR tag = '' ORDER BY id LIMIT 2 OFFSET 13)");
+        await query("UPDATE products SET tag = 'bundle' WHERE id IN (SELECT id FROM products WHERE tag IS NULL OR tag = '' ORDER BY id LIMIT 4 OFFSET 15)");
+      }
     }
     if (name === 'orders' && !colNames.includes('internal_notes')) await query('ALTER TABLE orders ADD COLUMN internal_notes TEXT');
     if (name === 'orders' && !colNames.includes('status_history')) await query("ALTER TABLE orders ADD COLUMN status_history TEXT DEFAULT '[]'");
