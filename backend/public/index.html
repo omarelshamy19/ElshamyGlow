@@ -797,7 +797,6 @@ img{max-width:100%;display:block}
   <a href="#" class="header-logo">ElShamy<span>Glow</span></a>
   <nav class="nav" id="nav">
     <a href="#home" class="nav-item active" data-page="home">Home</a>
-    <a href="#categories" class="nav-item" data-page="categories">Shop All</a>
     <a href="#deals" class="nav-item" data-page="deals">New Arrivals</a>
     <div class="nav-item">
       Bundles <i class="fas fa-chevron-down" style="font-size:10px;margin-left:4px"></i>
@@ -811,7 +810,6 @@ img{max-width:100%;display:block}
     <div class="nav-item">
       Beauty &amp; Makeup <i class="fas fa-chevron-down" style="font-size:10px;margin-left:4px"></i>
       <div class="nav-dropdown">
-        <a href="#categories" data-page="categories">All</a>
         <a href="#cat-1" data-page="cat-1">Lipstick</a>
         <a href="#cat-2" data-page="cat-2">Creamy Tint &amp; Blusher</a>
         <a href="#cat-1" data-page="cat-1">Lip Care</a>
@@ -820,7 +818,6 @@ img{max-width:100%;display:block}
     <div class="nav-item">
       Hair Care <i class="fas fa-chevron-down" style="font-size:10px;margin-left:4px"></i>
       <div class="nav-dropdown">
-        <a href="#categories" data-page="categories">All</a>
         <a href="#cat-6" data-page="cat-6">Shower Routine</a>
         <a href="#cat-6" data-page="cat-6">Hair Oils</a>
         <a href="#cat-6" data-page="cat-6">Hair Serum</a>
@@ -831,13 +828,11 @@ img{max-width:100%;display:block}
     <div class="nav-item">
       Skincare <i class="fas fa-chevron-down" style="font-size:10px;margin-left:4px"></i>
       <div class="nav-dropdown">
-        <a href="#categories" data-page="categories">All</a>
         <a href="#cat-7" data-page="cat-7">Face Soap</a>
         <a href="#cat-4" data-page="cat-4">Night Cream</a>
         <a href="#cat-4" data-page="cat-4">Face Serum</a>
       </div>
     </div>
-    <a href="#categories" class="nav-item" data-page="categories">Body Care</a>
   </nav>
   <div class="header-actions">
     <button class="header-btn" onclick="toggleSearch()"><i class="fas fa-search"></i></button>
@@ -851,13 +846,13 @@ img{max-width:100%;display:block}
 <div class="mobile-nav" id="mobileNav">
   <button class="close-btn" onclick="toggleMobileNav()"><i class="fas fa-times"></i></button>
   <a href="#" data-page="home" onclick="toggleMobileNav()">Home</a>
-  <a href="#" data-page="categories" onclick="toggleMobileNav()">Shop All</a>
   <a href="#" data-page="deals" onclick="toggleMobileNav()">New Arrivals</a>
   <a href="#" data-page="bundles" onclick="toggleMobileNav()">Bundles</a>
-  <a href="#" data-page="categories" onclick="toggleMobileNav()">Beauty &amp; Makeup</a>
-  <a href="#" data-page="categories" onclick="toggleMobileNav()">Hair Care</a>
-  <a href="#" data-page="categories" onclick="toggleMobileNav()">Skincare</a>
-  <a href="#" data-page="categories" onclick="toggleMobileNav()">Body Care</a>
+  <a href="#" data-page="cat-1" onclick="toggleMobileNav()">Lipstick</a>
+  <a href="#" data-page="cat-2" onclick="toggleMobileNav()">Creamy Tint &amp; Blusher</a>
+  <a href="#" data-page="cat-6" onclick="toggleMobileNav()">Hair Care</a>
+  <a href="#" data-page="cat-4" onclick="toggleMobileNav()">Skincare</a>
+  <a href="#" data-page="cat-7" onclick="toggleMobileNav()">Face Care</a>
 </div>
 <div class="cart-overlay" id="cartOverlay" onclick="toggleCart()"></div>
 
@@ -918,21 +913,13 @@ img{max-width:100%;display:block}
   </section>
 </div>
 
-<!-- ═══ PAGE: SHOP BY CATEGORY ═══ -->
-<div class="page-section" id="page-categories">
-  <section class="section">
-    <div class="section-title">Shop by Category <span class="see-all" data-page="categories">See All →</span></div>
-    <div class="grid-4" id="categoryGrid"></div>
-  </section>
-</div>
-
 <!-- ═══ PAGE: CATEGORY RESULTS (dynamic, filtered by category_id) ═══ -->
 <div class="page-section" id="page-cat-results">
   <section class="section">
     <div class="section-title" id="catResultsTitle">Category</div>
     <div class="grid-4" id="catResultsGrid"></div>
     <div id="catResultsEmpty" style="display:none;text-align:center;padding:60px 20px;color:#999;font-size:18px">No products found in this category</div>
-    <div style="text-align:center;margin-top:30px"><a href="#categories" onclick="navigate('categories')">← Back to all categories</a></div>
+    <div style="text-align:center;margin-top:30px"><a href="#home" onclick="navigate('home')">← Back to Home</a></div>
   </section>
 </div>
 
@@ -1226,14 +1213,6 @@ function renderFeatured(p){
     </div>`;
 }
 
-function renderCategories(cats){
-  const grid = document.getElementById('categoryGrid');
-  if(!grid) return;
-  grid.innerHTML = (cats || []).map(c =>
-    `<div class="cat-card" onclick="navigate('cat-${c.id}')"><img src="${c.image||''}" alt="${c.name_en||c.name_ar||''}" loading="lazy"><div class="cat-name">${c.name_en||c.name_ar||''}</div></div>`
-  ).join('');
-}
-
 async function loadCategoryProducts(catId){
   const grid = document.getElementById('catResultsGrid');
   const title = document.getElementById('catResultsTitle');
@@ -1276,7 +1255,7 @@ async function init(){
     }
     renderFeatured(featuredProduct);
 
-    renderCategories(allData.categories || []);
+
 
     loadCart();
   } catch(e){
