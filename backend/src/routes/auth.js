@@ -117,7 +117,7 @@ router.post('/verify-email', async (req, res) => {
 // Google OAuth - redirect to Google
 router.get('/google', (req, res) => {
   const clientId = process.env.GOOGLE_CLIENT_ID;
-  const defaultRedirect = process.env.GOOGLE_REDIRECT_URI || 'https://cosmetics-store-api.vercel.app/api/auth/google/callback';
+  const defaultRedirect = process.env.GOOGLE_REDIRECT_URI || 'https://elshamyglow.vercel.app/api/auth/google/callback';
   if (!clientId) return res.status(500).json({ error: 'Google OAuth not configured' });
   const redirectUri = req.query.redirect_uri || defaultRedirect;
   const state = req.query.redirect_uri ? Buffer.from(req.query.redirect_uri).toString('base64') : '';
@@ -130,10 +130,10 @@ router.get('/google/callback', async (req, res) => {
   const { code, state } = req.query;
   const clientId = process.env.GOOGLE_CLIENT_ID;
   const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
-  const redirectUri = process.env.GOOGLE_REDIRECT_URI || 'https://cosmetics-store-api.vercel.app/api/auth/google/callback';
-  const frontendUrl = process.env.FRONTEND_URL || 'https://adhamkhaled1510.github.io/glowrx-store';
+  const redirectUri = process.env.GOOGLE_REDIRECT_URI || 'https://elshamyglow.vercel.app/api/auth/google/callback';
+  const frontendUrl = process.env.FRONTEND_URL || 'https://adhamkhaled1510.github.io/elshamyglow';
   let customRedirect = null;
-  if (state) { try { const decoded = Buffer.from(state, 'base64').toString(); if (decoded.startsWith('http') || decoded.startsWith('glowrx://')) customRedirect = decoded; } catch {} }
+  if (state) { try { const decoded = Buffer.from(state, 'base64').toString(); if (decoded.startsWith('http') || decoded.startsWith('elshamyglow://')) customRedirect = decoded; } catch {} }
   if (!code || !clientId || !clientSecret) return res.status(400).json({ error: 'Missing params' });
   try {
     const tokenRes = await fetch('https://oauth2.googleapis.com/token', {

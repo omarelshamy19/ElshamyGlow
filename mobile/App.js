@@ -22,7 +22,7 @@ import VerifyScreen from './src/screens/VerifyScreen';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
-const API_URL = 'https://cosmetics-store-api.vercel.app/api';
+const API_URL = 'https://elshamyglow.vercel.app/api';
 
 function MainTabs() {
   return (
@@ -83,7 +83,7 @@ export default function App() {
 
   useEffect(() => {
     const handler = ({ url }) => {
-      if (url && url.startsWith('glowrx://auth/callback')) {
+      if (url && url.startsWith('elshamyglow://auth/callback')) {
         const parsed = Linking.parse(url);
         const token = parsed.queryParams?.token;
         if (token) {

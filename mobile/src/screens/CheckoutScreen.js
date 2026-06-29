@@ -6,7 +6,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useLanguage } from '../context/LanguageContext';
 import { useCart } from '../context/CartContext';
 import { createOrder, validateCoupon } from '../api';
-const API_URL = 'https://cosmetics-store-api.vercel.app/api';
+const API_URL = 'https://elshamyglow.vercel.app/api';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { t } from '../i18n';
 

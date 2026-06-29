@@ -7,7 +7,7 @@ import { useLanguage } from '../context/LanguageContext';
 import { login, register } from '../api';
 import { t } from '../i18n';
 
-const API_URL = 'https://cosmetics-store-api.vercel.app/api';
+const API_URL = 'https://elshamyglow.vercel.app/api';
 
 export default function AuthScreen({ navigation }) {
   const { lang } = useLanguage();

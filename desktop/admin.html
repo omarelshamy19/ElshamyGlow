@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>GlowRX Manager - لوحة التحكم</title>
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://fonts.googleapis.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://cosmetics-store-api.vercel.app; img-src 'self' data: blob:; media-src 'self' blob:;">
+<title>Elshamy Glow Manager - لوحة التحكم</title>
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://fonts.googleapis.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://elshamyglow.vercel.app; img-src 'self' data: blob:; media-src 'self' blob:;">
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
@@ -310,7 +310,7 @@ select.status-select{
 <!-- ===== LOGIN ===== -->
 <div class="login-page" id="loginPage">
   <div class="login-card">
-    <div class="login-logo"><span>GlowRX</span></div>
+    <div class="login-logo"><span>Elshamy Glow</span></div>
     <div class="login-sub">لوحة تحكم المتجر</div>
     <div class="form-group">
       <input type="email" id="loginEmail" placeholder="البريد الإلكتروني" dir="ltr" style="text-align:right">
@@ -331,7 +331,7 @@ select.status-select{
 <!-- ===== SIDEBAR ===== -->
 <div class="sidebar" id="sidebar">
   <div class="sidebar-header">
-    <div class="logo">✦ GlowRX</div>
+    <div class="logo">✦ Elshamy Glow</div>
     <div class="logo-sub">لوحة التحكم</div>
     <div id="lowStockAlert" style="display:none;margin-top:6px;cursor:pointer" onclick="showSection('products');showLowStock()">
       <span style="background:#ef4444;color:#fff;font-size:10px;padding:2px 10px;border-radius:10px;">⚠️ <span id="lowStockCount">0</span> منخفض</span>
@@ -621,8 +621,8 @@ select.status-select{
 <div class="toast-container" id="toastContainer"></div>
 
 <script>
-const API = 'https://cosmetics-store-api.vercel.app/api';
-const STORE_URL = 'https://adhamkhaled1510.github.io/glowrx-store/';
+const API = 'https://elshamyglow.vercel.app/api';
+const STORE_URL = 'https://adhamkhaled1510.github.io/elshamyglow/';
 let token = localStorage.getItem('adminToken') || '';
 let adminKey = localStorage.getItem('adminKey') || '';
 let lang = localStorage.getItem('adminLang') || 'ar';
@@ -1421,7 +1421,7 @@ async function printInvoice(id) {
         .total{text-align:left;font-size:20px;font-weight:800;color:#8B2F8E;border-top:2px solid #8B2F8E;padding-top:12px}
         .footer{text-align:center;color:#aaa;font-size:12px;margin-top:40px;border-top:1px solid #eee;padding-top:20px}
       </style></head><body>
-      <div class="header"><h1>✦ GlowRX</h1><div><div style="font-size:11px;color:#888">${t('فاتورة','INVOICE')} #${o.id}</div><div style="font-size:12px;color:#666">${new Date(o.created_at).toLocaleDateString()}</div></div></div>
+      <div class="header"><h1>✦ Elshamy Glow</h1><div><div style="font-size:11px;color:#888">${t('فاتورة','INVOICE')} #${o.id}</div><div style="font-size:12px;color:#666">${new Date(o.created_at).toLocaleDateString()}</div></div></div>
       <div class="info">
         <div><label>${t('العميل','Customer')}</label><div class="val">${o.user_name || 'Guest'}</div></div>
         <div><label>${t('الهاتف','Phone')}</label><div class="val">${o.phone || o.user_phone || '—'}</div></div>
@@ -1430,7 +1430,7 @@ async function printInvoice(id) {
       </div>
       <table><tr><th>${t('المنتج','Item')}</th><th>${t('الكمية','Qty')}</th><th>${t('السعر','Price')}</th><th>${t('الإجمالي','Total')}</th></tr>${items}</table>
       <div class="total">${t('المجموع','Total')}: ${Math.round(o.total)} EGP</div>
-      <div class="footer">GlowRX — ${t('شكراً لتسوقك معنا','Thank you for shopping with us')}</div>
+      <div class="footer">Elshamy Glow — ${t('شكراً لتسوقك معنا','Thank you for shopping with us')}</div>
       <script>window.print();window.onafterprint=()=>window.close();<\/script>
     </body></html>`);
     win.document.close();

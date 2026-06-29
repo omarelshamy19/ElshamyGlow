@@ -81,7 +81,7 @@ function createWindow() {
     height: Math.min(800, sh - 40),
     minWidth: 800,
     minHeight: 500,
-    title: 'GlowRX Manager - لوحة التحكم',
+    title: 'Elshamy Glow Manager - لوحة التحكم',
     icon: appIcon,
     backgroundColor: '#0f0a12',
     show: false,
@@ -105,7 +105,7 @@ function createWindow() {
       mainWindow.hide();
       if (Notification.isSupported()) {
         new Notification({
-          title: 'GlowRX Manager',
+          title: 'Elshamy Glow Manager',
           body: 'التطبيق لا يزال يعمل في شريط المهام',
         }).show();
       }
@@ -121,7 +121,7 @@ function createWindow() {
 
 function createTray() {
   tray = new Tray(appIcon);
-  tray.setToolTip('GlowRX Manager - لوحة التحكم');
+  tray.setToolTip('Elshamy Glow Manager - لوحة التحكم');
 
   const contextMenu = Menu.buildFromTemplate([
     { label: '🖥️ فتح لوحة التحكم', click: () => { mainWindow.show(); mainWindow.focus(); } },
@@ -188,7 +188,7 @@ function pollOrders() {
       if (creds.token) headers['Authorization'] = 'Bearer ' + creds.token;
       else if (creds.adminKey) headers['x-admin-key'] = creds.adminKey;
       else return; // No credentials yet
-      const res = await fetch('https://cosmetics-store-api.vercel.app/api/admin/stats', { headers });
+      const res = await fetch('https://elshamyglow.vercel.app/api/admin/stats', { headers });
       const data = await res.json();
       const count = data.stats.totalOrders;
       if (count > lastOrderCount && lastOrderCount > 0) {
@@ -203,7 +203,7 @@ function pollOrders() {
         if (mainWindow && !mainWindow.isVisible()) {
           tray.displayBalloon({
             title: 'طلب جديد',
-            content: `تم استلام ${newOrders} طلب جديد في GlowRX`,
+            content: `تم استلام ${newOrders} طلب جديد في Elshamy Glow`,
           });
         }
       }

@@ -1,0 +1,12 @@
+[Desktop Entry]
+Version=1.0.0
+Name=Elshamy Glow Manager
+Name[ar]=Elshamy Glow - لوحة التحكم
+Comment=نظام إدارة المتجر
+Comment[en]=Store Management System
+Exec=/media/Data1/opencode/elshamyglow/desktop/launch.sh
+Icon=/media/Data1/opencode/elshamyglow/desktop/icon.png
+Terminal=false
+Type=Application
+Categories=Utility;Office;
+StartupWMClass=ElshamyGlow-Manager

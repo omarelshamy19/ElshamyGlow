@@ -6,23 +6,23 @@
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
-    "scheme": "glowrx",
+    "scheme": "elshamyglow",
     "splash": {
       "backgroundColor": "#FF6B9D"
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.cosmetics.store"
+      "bundleIdentifier": "com.elshamyglow.store"
     },
     "android": {
       "adaptiveIcon": {
         "backgroundColor": "#FF6B9D"
       },
-      "package": "com.cosmetics.store",
+      "package": "com.elshamyglow.store",
       "intentFilters": [
         {
           "action": "VIEW",
-          "data": [{ "scheme": "glowrx" }],
+          "data": [{ "scheme": "elshamyglow" }],
           "category": ["BROWSABLE", "DEFAULT"]
         }
       ]

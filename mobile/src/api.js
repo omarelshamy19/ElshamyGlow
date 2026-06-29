@@ -1,7 +1,7 @@
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const API_URL = 'https://cosmetics-store-api.vercel.app/api';
+const API_URL = 'https://elshamyglow.vercel.app/api';
 
 const api = axios.create({
   baseURL: API_URL,

@@ -6,7 +6,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useLanguage } from '../context/LanguageContext';
 import { t } from '../i18n';
 
-const API_URL = 'https://cosmetics-store-api.vercel.app/api';
+const API_URL = 'https://elshamyglow.vercel.app/api';
 
 export default function VerifyScreen({ route, navigation }) {
   const { lang } = useLanguage();

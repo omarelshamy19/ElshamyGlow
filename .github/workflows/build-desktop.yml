@@ -76,9 +76,9 @@ jobs:
           files: release-assets/*
           generate_release_notes: true
           tag_name: ${{ github.ref_name }}
-          name: GlowRX Manager ${{ github.ref_name }}
+          name: Elshamy Glow Manager ${{ github.ref_name }}
           body: |
-            ## GlowRX Manager - برنامج إدارة المتجر
+            ## Elshamy Glow Manager - برنامج إدارة المتجر
 
             ### التحميل:
             - **Windows**: `GlowRX Manager Setup-*.exe`
@@ -90,5 +90,5 @@ jobs:
             3. Windows: شغل الـ Setup.exe ونصبه
 
             ### بيانات الدخول:
-            - الإيميل: `admin@glowrx.com`
+            - الإيميل: `admin@elshamyglow.com`
             - كلمة المرور: `admin123`

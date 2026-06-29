@@ -3,17 +3,17 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>GlowRX — بيوتي ستور | Premium Cosmetics & Skincare</title>
-<meta name="description" content="GlowRX — Premium cosmetics and skincare store. Shop lipsticks, foundation, eye makeup, perfumes, and skincare products. جمالك يبدأ مع GlowRX.">
-<meta name="keywords" content="cosmetics, skincare, makeup, beauty, glowrx, مكياج, عناية بالبشرة, تجميل, أحمر شفاه">
-<meta name="author" content="GlowRX">
+<title>Elshamy Glow — بيوتي ستور | Premium Cosmetics & Skincare</title>
+<meta name="description" content="Elshamy Glow — Premium cosmetics and skincare store. Shop lipsticks, foundation, eye makeup, perfumes, and skincare products. جمالك يبدأ مع Elshamy Glow.">
+<meta name="keywords" content="cosmetics, skincare, makeup, beauty, elshamy glow, مكياج, عناية بالبشرة, تجميل, أحمر شفاه">
+<meta name="author" content="Elshamy Glow">
 <meta name="google-site-verification" content="google06d9fe363395c7e8">
-<meta property="og:title" content="GlowRX — Premium Cosmetics Store">
-<meta property="og:description" content="Unlock your natural radiance with GlowRX premium cosmetics.">
-<meta property="og:url" content="https://adhamkhaled1510.github.io/glowrx-store/">
+<meta property="og:title" content="Elshamy Glow — Premium Cosmetics Store">
+<meta property="og:description" content="Unlock your natural radiance with Elshamy Glow premium cosmetics.">
+<meta property="og:url" content="https://adhamkhaled1510.github.io/elshamyglow/">
 <meta property="og:type" content="website">
 <meta name="twitter:card" content="summary_large_image">
-<link rel="canonical" href="https://adhamkhaled1510.github.io/glowrx-store/">
+<link rel="canonical" href="https://adhamkhaled1510.github.io/elshamyglow/">
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@200;300;400;600;700;900&family=Playfair+Display:ital,wght@0,700;0,900;1,700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <style>
@@ -1484,7 +1484,7 @@ img { max-width: 100%; display: block; }
 <script>
 const API_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
   ? 'http://localhost:3000/api'
-  : 'https://cosmetics-store-api.vercel.app/api';
+  : 'https://elshamyglow.vercel.app/api';
 
 let products = [];
 let categories = [];
@@ -1860,7 +1860,7 @@ async function handleLogin() {
   try {
     const res=await fetch(`${API_URL}/auth/login`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,password})});
     const data=await res.json(); if(!res.ok) throw new Error(data.error);
-    token=data.token; user=data.user; localStorage.setItem('glowrx_token',token); localStorage.setItem('glowrx_user',JSON.stringify(user));
+    token=data.token; user=data.user; localStorage.setItem('elshamyglow_token',token); localStorage.setItem('elshamyglow_user',JSON.stringify(user));
     hideAuth(); updateAuthUI(); showToast(currentLang==='ar'?'تم تسجيل الدخول ✓':'Signed in ✓','success');
   } catch(e) { showToast(e.message||(currentLang==='ar'?'خطأ في تسجيل الدخول':'Login failed'),'error'); }
 }
@@ -1871,7 +1871,7 @@ async function handleRegister() {
   try {
     const res=await fetch(`${API_URL}/auth/register`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name,email,password,phone})});
     const data=await res.json(); if(!res.ok) throw new Error(data.error);
-    token=data.token; user=data.user; localStorage.setItem('glowrx_token',token); localStorage.setItem('glowrx_user',JSON.stringify(user));
+    token=data.token; user=data.user; localStorage.setItem('elshamyglow_token',token); localStorage.setItem('elshamyglow_user',JSON.stringify(user));
     hideAuth(); updateAuthUI(); showToast(currentLang==='ar'?'تم إنشاء الحساب ✓':'Account created ✓','success');
   } catch(e) { showToast(e.message||(currentLang==='ar'?'فشل إنشاء الحساب':'Registration failed'),'error'); }
 }
@@ -1879,7 +1879,7 @@ async function handleRegister() {
 function updateAuthUI() { const b=document.getElementById('authBtn'); b.innerHTML=user?`<i class="fa-solid fa-circle-check" style="color:var(--pink)"></i>`:`<i class="fa-regular fa-user"></i>`; b.title=user?user.name||user.email:'Account'; }
 
 function restoreAuth() {
-  const s=localStorage.getItem('glowrx_token'), su=localStorage.getItem('glowrx_user');
+  const s=localStorage.getItem('elshamyglow_token'), su=localStorage.getItem('elshamyglow_user');
   if(s&&su){token=s; try{user=JSON.parse(su)}catch{} if(user) updateAuthUI();}
 }
 

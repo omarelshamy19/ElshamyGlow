@@ -1,4 +1,4 @@
-const TURSO_URL = process.env.TURSO_DB_URL || 'https://glowrx-db-adhamkhaled15.aws-us-east-2.turso.io';
+const TURSO_URL = process.env.TURSO_DB_URL || 'https://elshamyglow-db-adhamkhaled15.aws-us-east-2.turso.io';
 const TURSO_TOKEN = process.env.TURSO_AUTH_TOKEN || 'eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJhIjoicnciLCJpYXQiOjE3ODI2MjAxNDQsImlkIjoiMDE5ZjBjNzAtNGUwMS03ZDcwLWFjZDEtYmQ4N2FjYTY3OWFiIiwicmlkIjoiNGYyMzQ5MGItYTY5ZC00Mzc3LWE5YTAtNzVkMjhkZjY5ZDA5In0.60D30vyE42AA_XzuBpx7RQqVS_5n_v1YQbd_uOr3TF_esaCp5NPggUdWjJzF3SYAElRBBhgm-K1rTDAAslX5AA';
 
 let ready = false;
