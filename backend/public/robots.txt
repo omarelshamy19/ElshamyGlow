@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://omarelshamy19.github.io/ElshamyGlow/sitemap.xml
