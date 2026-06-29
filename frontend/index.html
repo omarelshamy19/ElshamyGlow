@@ -1117,40 +1117,6 @@ img{max-width:100%;display:block}
 <script>
 const API = 'https://elshamyglow.vercel.app/api';
 
-/* ═══ DATA ═══ */
-const bundles = [
-  {name:'Ultimate Hair Care Bundle',price:1068,orig:1425,img:'https://images.unsplash.com/photo-1535585209827-a15fcdbc4c2d?w=400'},
-  {name:'Glowy Skin Bundle',price:940,orig:1250,img:'https://images.unsplash.com/photo-1570194065650-d99fb4b8ccb0?w=400'},
-  {name:'Wooden Bundle',price:390,orig:525,img:'https://images.unsplash.com/photo-1526947425960-945c6e72858f?w=400'},
-  {name:'Skin Brightening Bundle',price:null,orig:null,img:'https://images.unsplash.com/photo-1620916566398-39f1143ab7be?w=400',soldOut:true},
-  {name:'Cellulite Bundle',price:230,orig:355,img:'https://images.unsplash.com/photo-1611930022073-b7a4ba5fcccd?w=400'},
-  {name:'Stretch Marks Bundle',price:345,orig:null,img:'https://images.unsplash.com/photo-1627384113745-fa7e2e8c6c8a?w=400'},
-  {name:'Strengthening Nails Bundle',price:355,orig:null,img:'https://images.unsplash.com/photo-1631214502566-7c5bfd6ef3e3?w=400'},
-  {name:'Shea Curls Full Routine',price:920,orig:1080,img:'https://images.unsplash.com/photo-1556229162-5c63ed7c4efb?w=400'},
-  {name:'Shea Curls Bundle',price:578,orig:680,img:'https://images.unsplash.com/photo-1526947425960-945c6e72858f?w=400'},
-  {name:'Hair Rescue Bundle',price:800,orig:1000,img:'https://images.unsplash.com/photo-1535585209827-a15fcdbc4c2d?w=400'},
-  {name:'Silky Smooth Bundle',price:563,orig:805,img:'https://images.unsplash.com/photo-1556229162-5c63ed7c4efb?w=400'},
-];
-
-const bridalItems = [
-  {name:'Glow & Shine Bridal Box',price:1600,orig:1800,img:'https://images.unsplash.com/photo-1512496015851-a90fb38ba796?w=400'},
-  {name:'Skin & Body Care Bridal Box',price:1565,orig:1765,img:'https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=400'},
-  {name:'Hair Care Bridal Box',price:2240,orig:2440,img:'https://images.unsplash.com/photo-1526947425960-945c6e72858f?w=400'},
-];
-
-const categories = [
-  {name:'Face Soap',img:'https://images.unsplash.com/photo-1611930022073-b7a4ba5fcccd?w=400'},
-  {name:'Hair Care',img:'https://images.unsplash.com/photo-1535585209827-a15fcdbc4c2d?w=400'},
-  {name:'Lip Care',img:'https://images.unsplash.com/photo-1586495777744-4413f21062fa?w=400'},
-  {name:'Lipstick',img:'https://images.unsplash.com/photo-1586495777744-4413f21062fa?w=400'},
-  {name:'Body Oils',img:'https://images.unsplash.com/photo-1541643600914-78b084683601?w=400'},
-  {name:'Hair Oils',img:'https://images.unsplash.com/photo-1526947425960-945c6e72858f?w=400'},
-  {name:'Creamy Tint & Blusher',img:'https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=400'},
-  {name:'Henna',img:'https://images.unsplash.com/photo-1535585209827-a15fcdbc4c2d?w=400'},
-  {name:'Satin',img:'https://images.unsplash.com/photo-1556229162-5c63ed7c4efb?w=400'},
-  {name:'Skincare',img:'https://images.unsplash.com/photo-1570194065650-d99fb4b8ccb0?w=400'},
-];
-
 let cart = [];
 let currentLang = 'en';
 let authToken = localStorage.getItem('elshamyglow_token') || '';
@@ -1158,64 +1124,68 @@ let authUser = null;
 let pendingVerifyEmail = '';
 let pendingLoginPass = '';
 let tempToken = '';
+let featuredProduct = null;
+
+function parseImages(images) {
+  try { return JSON.parse(images); } catch(e) { return images ? [images] : []; }
+}
+
+function getProductImage(p) {
+  const images = parseImages(p.images);
+  return images[0] || '';
+}
+
+function getProductName(p) {
+  return p.name_en || p.name_ar || '';
+}
 
 /* ═══ RENDER ═══ */
-function renderProdCard(p, discount){
-  const discBadge = discount ? `<div class="prod-sale-badge">-${discount}%</div>` : '';
-  const soldOut = p.soldOut ? '<div class="prod-sold-out">SOLD OUT</div>' : '';
-  const origPrice = p.orig ? `<span class="orig">${Number(p.orig).toLocaleString()} EGP</span>` : '';
-  const safeName = (p.name||'').replace(/'/g,"\\'");
-  const safePrice = Number(p.price||0);
-  const safeImg = p.img||'';
+function renderProdCard(p){
+  const images = parseImages(p.images);
+  const img = images[0] || p.img || '';
+  const name = getProductName(p);
+  const price = Number(p.price || p.price === 0 ? p.price : 0);
+  const soldOut = p.stock !== undefined && p.stock <= 0;
+  const soldOutHtml = soldOut ? '<div class="prod-sold-out">SOLD OUT</div>' : '';
+  const safeName = name.replace(/'/g,"\\'");
+  const safeId = p.id || 0;
   return `<div class="prod-card">
-    <div class="prod-img-wrap">${discBadge}${soldOut}<img src="${safeImg}" alt="${p.name||''}" loading="lazy" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect fill=%22%23f0f0f0%22 width=%22100%22 height=%22100%22/><text x=%2250%22 y=%2255%22 text-anchor=%22middle%22 fill=%22%23999%22 font-size=%2230%22>📦</text></svg>'"></div>
+    <div class="prod-img-wrap">${soldOutHtml}<img src="${img}" alt="${name}" loading="lazy" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect fill=%22%23f0f0f0%22 width=%22100%22 height=%22100%22/><text x=%2250%22 y=%2255%22 text-anchor=%22middle%22 fill=%22%23999%22 font-size=%2230%22>📦</text></svg>'"></div>
     <div class="prod-info">
-      <div class="prod-name">${p.name||''}</div>
-      <div class="prod-price"><span class="sale">${safePrice ? safePrice.toLocaleString()+' EGP' : ''}</span>${origPrice}</div>
-      ${!p.soldOut && p.price ? `<button class="add-cart" onclick="addToCart({name:'${safeName}',price:${safePrice},img:'${safeImg}'})">Add to Cart</button>` : ''}
+      <div class="prod-name">${name}</div>
+      <div class="prod-price"><span class="sale">${price ? price.toLocaleString()+' EGP' : ''}</span></div>
+      ${!soldOut && price ? `<button class="add-cart" onclick="addToCart({id:${safeId},name:'${safeName}',price:${price},img:'${img}'})">Add to Cart</button>` : ''}
     </div>
   </div>`;
 }
 
-function renderScrollGrid(items, containerId, discountKey){
+function renderScrollGrid(items, containerId){
   const grid = document.getElementById(containerId);
   if(!grid) return;
-  grid.innerHTML = items.map(p => {
-    const disc = discountKey && p.orig ? Math.round((1-p.price/p.orig)*100) : 0;
-    return renderProdCard(p, disc);
-  }).join('');
+  grid.innerHTML = items.map(p => renderProdCard(p)).join('');
 }
 
-function init(){
-  renderScrollGrid([
-    {name:'L\'Oréal Paris Lipstick',price:185,orig:299,img:'https://images.unsplash.com/photo-1586495777744-4413f21062fa?w=400'},
-    {name:'Maybelline Lash Sensational',price:220,orig:350,img:'https://images.unsplash.com/photo-1631813657147-c6d10cf8c73e?w=400'},
-    {name:'Nivea Moisturizing Cream',price:95,orig:150,img:'https://images.unsplash.com/photo-1611930022073-b7a4ba5fcccd?w=400'},
-    {name:'Garnier Micellar Water',price:120,orig:185,img:'https://images.unsplash.com/photo-1627384113745-fa7e2e8c6c8a?w=400'},
-    {name:'Chanel No. 5',price:2750,orig:3500,img:'https://images.unsplash.com/photo-1541643600914-78b084683601?w=400'},
-    {name:'CeraVe Moisturizing Cream',price:350,orig:520,img:'https://images.unsplash.com/photo-1570194065650-d99fb4b8ccb0?w=400'},
-    {name:'The Ordinary Serum',price:280,orig:400,img:'https://images.unsplash.com/photo-1620916566398-39f1143ab7be?w=400'},
-    {name:'La Roche-Posay Eye Cream',price:450,orig:650,img:'https://images.unsplash.com/photo-1556229162-5c63ed7c4efb?w=400'},
-  ],'flashDealsGrid',true);
-  renderScrollGrid(bridalItems,'bridalGrid',true);
-  renderScrollGrid(bundles,'bundleGrid',true);
+function renderFeatured(p){
+  if(!p) return;
+  const images = parseImages(p.images);
+  const img = images[0] || '';
+  const name = getProductName(p);
+  const price = Number(p.price) || 0;
+  const desc = p.description_en || p.description_ar || '';
+  const thumbs = images.length ? images.map((im, i) =>
+    `<img src="${im}" class="${i===0?'active':''}" onclick="this.parentElement.querySelectorAll('img').forEach(i=>i.classList.remove('active'));this.classList.add('active');this.closest('.featured').querySelector('.main-img').src=this.src">`
+  ).join('') : `<img src="${img}" class="active"></div>`;
 
-  // Featured
-  const f = bundles[9];
   document.getElementById('featuredProduct').innerHTML = `
     <div class="featured-imgs">
-      <img class="main-img" src="${f.img}" alt="${f.name}">
-      <div class="thumbnails">
-        <img src="${f.img}" class="active" onclick="this.parentElement.querySelectorAll('img').forEach(i=>i.classList.remove('active'));this.classList.add('active');this.closest('.featured').querySelector('.main-img').src=this.src">
-        <img src="https://images.unsplash.com/photo-1526947425960-945c6e72858f?w=400" onclick="this.parentElement.querySelectorAll('img').forEach(i=>i.classList.remove('active'));this.classList.add('active');this.closest('.featured').querySelector('.main-img').src=this.src">
-        <img src="https://images.unsplash.com/photo-1535585209827-a15fcdbc4c2d?w=400" onclick="this.parentElement.querySelectorAll('img').forEach(i=>i.classList.remove('active'));this.classList.add('active');this.closest('.featured').querySelector('.main-img').src=this.src">
-      </div>
+      <img class="main-img" src="${img}" alt="${name}">
+      <div class="thumbnails">${thumbs}</div>
     </div>
     <div class="featured-info">
-      <div class="badge">🌟 Best Seller</div>
-      <h2>${f.name}</h2>
-      <p class="desc">Complete hair rescue solution with nourishing oils and serums. Restore your hair's natural shine and strength.</p>
-      <div class="prod-price"><span class="sale">${f.price.toLocaleString()} EGP</span><span class="orig">${f.orig.toLocaleString()} EGP</span></div>
+      <div class="badge">🌟 Featured Product</div>
+      <h2>${name}</h2>
+      <p class="desc">${desc}</p>
+      <div class="prod-price"><span class="sale">${price.toLocaleString()} EGP</span></div>
       <div class="qty-selector">
         <button onclick="const i=this.nextElementSibling;i.value=Math.max(1,parseInt(i.value)-1)">−</button>
         <input type="text" value="1" readonly>
@@ -1224,13 +1194,42 @@ function init(){
       <button class="btn btn-primary" onclick='addFeaturedToCart()'><i class="fas fa-shopping-bag"></i> Add to Cart</button>
       <a href="#" class="featured-details-link">View Full Details →</a>
     </div>`;
+}
 
-  // Categories
-  document.getElementById('categoryGrid').innerHTML = categories.map(c =>
-    `<div class="cat-card"><img src="${c.img}" alt="${c.name}" loading="lazy"><div class="cat-name">${c.name}</div></div>`
+function renderCategories(cats){
+  const grid = document.getElementById('categoryGrid');
+  if(!grid) return;
+  grid.innerHTML = (cats || []).map(c =>
+    `<div class="cat-card"><img src="${c.image||''}" alt="${c.name_en||c.name_ar||''}" loading="lazy"><div class="cat-name">${c.name_en||c.name_ar||''}</div></div>`
   ).join('');
+}
 
-  loadCart();
+async function init(){
+  try {
+    const [flashDeals, bridal, bundles, featuredList, allData] = await Promise.all([
+      api('/products?tag=flash_deal').then(d => d.products || []),
+      api('/products?tag=bridal').then(d => d.products || []),
+      api('/products?tag=bundle').then(d => d.products || []),
+      api('/products?tag=featured').then(d => d.products || []),
+      api('/products').catch(() => ({ products: [], categories: [] })),
+    ]);
+    renderScrollGrid(flashDeals, 'flashDealsGrid');
+    renderScrollGrid(bridal, 'bridalGrid');
+    renderScrollGrid(bundles, 'bundleGrid');
+
+    if(featuredList.length > 0){
+      featuredProduct = featuredList[0];
+    } else if(allData.products && allData.products.length > 0){
+      featuredProduct = allData.products[0];
+    }
+    renderFeatured(featuredProduct);
+
+    renderCategories(allData.categories || []);
+
+    loadCart();
+  } catch(e){
+    console.error('Failed to load products:', e);
+  }
 }
 
 /* ═══ CART ═══ */
@@ -1245,8 +1244,11 @@ function addToCart(product){
 
 function addFeaturedToCart(){
   const qty = parseInt(document.querySelector('#featuredProduct .qty-selector input')?.value || '1');
-  const f = bundles[9];
-  addToCart({name:f.name, price:f.price, img:f.img, qty});
+  if(featuredProduct){
+    const img = getProductImage(featuredProduct);
+    const name = getProductName(featuredProduct);
+    addToCart({name, price: featuredProduct.price, img, qty});
+  }
 }
 
 function removeFromCart(name){

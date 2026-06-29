@@ -4,12 +4,13 @@ const { dbAll, dbGet } = require('../db.js');
 const router = Router();
 
 router.get('/', async (req, res) => {
-  const { category, featured, search } = req.query;
+  const { category, featured, search, tag } = req.query;
   let sql = 'SELECT * FROM products WHERE 1=1';
   const params = [];
   if (category) { sql += ' AND category_id = ?'; params.push(category); }
   if (featured) { sql += ' AND featured = 1'; }
   if (search) { sql += ' AND (name_ar LIKE ? OR name_en LIKE ?)'; params.push(`%${search}%`, `%${search}%`); }
+  if (tag) { sql += ' AND tag = ?'; params.push(tag); }
   sql += ' ORDER BY created_at DESC';
   const products = await dbAll(sql, params);
   const categories = await dbAll('SELECT * FROM categories');

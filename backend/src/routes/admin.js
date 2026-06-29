@@ -90,18 +90,18 @@ router.get('/products', adminAuth, async (req, res) => {
 });
 
 router.post('/products', adminAuth, async (req, res) => {
-  const { name_ar, name_en, description_ar, description_en, price, stock, category_id, featured, images, sku, variants } = req.body;
+  const { name_ar, name_en, description_ar, description_en, price, stock, category_id, featured, images, sku, variants, tag } = req.body;
   if (!name_ar || !name_en || !price) return res.status(400).json({ error: 'Name (AR/EN) and price are required' });
-  const result = await dbRun('INSERT INTO products (name_ar, name_en, description_ar, description_en, price, stock, category_id, featured, images, sku, variants) VALUES (?,?,?,?,?,?,?,?,?,?,?)',
-    [name_ar, name_en, description_ar || '', description_en || '', price, stock || 0, category_id || null, featured ? 1 : 0, JSON.stringify(images || []), sku || null, JSON.stringify(variants || [])]);
+  const result = await dbRun('INSERT INTO products (name_ar, name_en, description_ar, description_en, price, stock, category_id, featured, images, sku, variants, tag) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)',
+    [name_ar, name_en, description_ar || '', description_en || '', price, stock || 0, category_id || null, featured ? 1 : 0, JSON.stringify(images || []), sku || null, JSON.stringify(variants || []), tag || '']);
   res.json({ id: result.lastInsertRowid, message: 'Product created' });
 });
 
 router.put('/products/:id', adminAuth, async (req, res) => {
   const existing = await dbGet('SELECT * FROM products WHERE id = ?', [req.params.id]);
   if (!existing) return res.status(404).json({ error: 'Product not found' });
-  const { name_ar, name_en, description_ar, description_en, price, stock, category_id, featured, images, sku, variants } = req.body;
-  await dbRun('UPDATE products SET name_ar=?, name_en=?, description_ar=?, description_en=?, price=?, stock=?, category_id=?, featured=?, images=?, sku=?, variants=? WHERE id=?',
+  const { name_ar, name_en, description_ar, description_en, price, stock, category_id, featured, images, sku, variants, tag } = req.body;
+  await dbRun('UPDATE products SET name_ar=?, name_en=?, description_ar=?, description_en=?, price=?, stock=?, category_id=?, featured=?, images=?, sku=?, variants=?, tag=? WHERE id=?',
     [name_ar ?? existing.name_ar, name_en ?? existing.name_en,
      description_ar !== undefined ? description_ar : existing.description_ar,
      description_en !== undefined ? description_en : existing.description_en,
@@ -111,6 +111,7 @@ router.put('/products/:id', adminAuth, async (req, res) => {
      images ? JSON.stringify(images) : existing.images,
      sku !== undefined ? sku : existing.sku,
      variants ? JSON.stringify(variants) : existing.variants,
+     tag !== undefined ? tag : existing.tag,
      req.params.id]);
   res.json({ message: 'Product updated' });
 });
@@ -137,8 +138,8 @@ router.post('/products/import', adminAuth, async (req, res) => {
         const cat = await dbGet('SELECT id FROM categories WHERE name_en = ?', [r.category_name_en]);
         catId = cat ? cat.id : null;
       }
-      await dbRun('INSERT INTO products (name_ar, name_en, description_ar, description_en, price, stock, category_id, featured, images, sku, variants) VALUES (?,?,?,?,?,?,?,?,?,?,?)',
-        [r.name_ar, r.name_en, r.description_ar || '', r.description_en || '', r.price, r.stock || 0, catId || null, r.featured ? 1 : 0, JSON.stringify(r.images ? (Array.isArray(r.images) ? r.images : [r.images]) : []), r.sku || null, JSON.stringify(r.variants || [])]);
+      await dbRun('INSERT INTO products (name_ar, name_en, description_ar, description_en, price, stock, category_id, featured, images, sku, variants, tag) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)',
+        [r.name_ar, r.name_en, r.description_ar || '', r.description_en || '', r.price, r.stock || 0, catId || null, r.featured ? 1 : 0, JSON.stringify(r.images ? (Array.isArray(r.images) ? r.images : [r.images]) : []), r.sku || null, JSON.stringify(r.variants || []), r.tag || '']);
       imported++;
     } catch (e) { errors.push({ row: i + 1, error: e.message }); }
   }

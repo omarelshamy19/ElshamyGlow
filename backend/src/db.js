@@ -77,6 +77,7 @@ async function initDb() {
     const colNames = (cols?.response?.result?.rows || []).map(r => r[1]?.value);
     if (name === 'products' && !colNames.includes('sku')) await query('ALTER TABLE products ADD COLUMN sku TEXT');
     if (name === 'products' && !colNames.includes('variants')) await query("ALTER TABLE products ADD COLUMN variants TEXT DEFAULT '[]'");
+    if (name === 'products' && !colNames.includes('tag')) await query("ALTER TABLE products ADD COLUMN tag TEXT DEFAULT ''");
     if (name === 'orders' && !colNames.includes('internal_notes')) await query('ALTER TABLE orders ADD COLUMN internal_notes TEXT');
     if (name === 'orders' && !colNames.includes('status_history')) await query("ALTER TABLE orders ADD COLUMN status_history TEXT DEFAULT '[]'");
     if (name === 'orders' && !colNames.includes('estimated_delivery')) await query('ALTER TABLE orders ADD COLUMN estimated_delivery TEXT');
