@@ -796,48 +796,48 @@ img{max-width:100%;display:block}
   <button class="mobile-menu-btn" onclick="toggleMobileNav()"><i class="fas fa-bars"></i></button>
   <a href="#" class="header-logo">ElShamy<span>Glow</span></a>
   <nav class="nav" id="nav">
-    <a href="#home" class="nav-item active" onclick="navigate('home')">Home</a>
-    <a href="#categories" class="nav-item" onclick="navigate('categories')">Shop All</a>
-    <a href="#deals" class="nav-item" onclick="navigate('deals')">New Arrivals</a>
+    <a href="#home" class="nav-item active" onclick="return navigate('home')">Home</a>
+    <a href="#categories" class="nav-item" onclick="return navigate('categories')">Shop All</a>
+    <a href="#deals" class="nav-item" onclick="return navigate('deals')">New Arrivals</a>
     <div class="nav-item">
       Bundles <i class="fas fa-chevron-down" style="font-size:10px;margin-left:4px"></i>
       <div class="nav-dropdown">
-        <a href="#bundles" onclick="navigate('bundles')">All Bundles</a>
-        <a href="#bundles" onclick="navigate('bundles')">Hair Care Bundles</a>
-        <a href="#bundles" onclick="navigate('bundles')">Skincare Bundles</a>
-        <a href="#bridal" onclick="navigate('bridal')">Bridal Bundles</a>
+        <a href="#bundles" onclick="return navigate('bundles')">All Bundles</a>
+        <a href="#bundles" onclick="return navigate('bundles')">Hair Care Bundles</a>
+        <a href="#bundles" onclick="return navigate('bundles')">Skincare Bundles</a>
+        <a href="#bridal" onclick="return navigate('bridal')">Bridal Bundles</a>
       </div>
     </div>
     <div class="nav-item">
       Beauty &amp; Makeup <i class="fas fa-chevron-down" style="font-size:10px;margin-left:4px"></i>
       <div class="nav-dropdown">
-        <a href="#categories" onclick="navigate('categories')">All</a>
-        <a href="#categories" onclick="navigate('categories')">Lipstick</a>
-        <a href="#categories" onclick="navigate('categories')">Creamy Tint &amp; Blusher</a>
-        <a href="#categories" onclick="navigate('categories')">Lip Care</a>
+        <a href="#categories" onclick="return navigate('categories')">All</a>
+        <a href="#categories" onclick="return navigate('categories')">Lipstick</a>
+        <a href="#categories" onclick="return navigate('categories')">Creamy Tint &amp; Blusher</a>
+        <a href="#categories" onclick="return navigate('categories')">Lip Care</a>
       </div>
     </div>
     <div class="nav-item">
       Hair Care <i class="fas fa-chevron-down" style="font-size:10px;margin-left:4px"></i>
       <div class="nav-dropdown">
-        <a href="#categories" onclick="navigate('categories')">All</a>
-        <a href="#categories" onclick="navigate('categories')">Shower Routine</a>
-        <a href="#categories" onclick="navigate('categories')">Hair Oils</a>
-        <a href="#categories" onclick="navigate('categories')">Hair Serum</a>
-        <a href="#categories" onclick="navigate('categories')">Satin</a>
-        <a href="#categories" onclick="navigate('categories')">Henna</a>
+        <a href="#categories" onclick="return navigate('categories')">All</a>
+        <a href="#categories" onclick="return navigate('categories')">Shower Routine</a>
+        <a href="#categories" onclick="return navigate('categories')">Hair Oils</a>
+        <a href="#categories" onclick="return navigate('categories')">Hair Serum</a>
+        <a href="#categories" onclick="return navigate('categories')">Satin</a>
+        <a href="#categories" onclick="return navigate('categories')">Henna</a>
       </div>
     </div>
     <div class="nav-item">
       Skincare <i class="fas fa-chevron-down" style="font-size:10px;margin-left:4px"></i>
       <div class="nav-dropdown">
-        <a href="#categories" onclick="navigate('categories')">All</a>
-        <a href="#categories" onclick="navigate('categories')">Face Soap</a>
-        <a href="#categories" onclick="navigate('categories')">Night Cream</a>
-        <a href="#categories" onclick="navigate('categories')">Face Serum</a>
+        <a href="#categories" onclick="return navigate('categories')">All</a>
+        <a href="#categories" onclick="return navigate('categories')">Face Soap</a>
+        <a href="#categories" onclick="return navigate('categories')">Night Cream</a>
+        <a href="#categories" onclick="return navigate('categories')">Face Serum</a>
       </div>
     </div>
-    <a href="#categories" class="nav-item" onclick="navigate('categories')">Body Care</a>
+    <a href="#categories" class="nav-item" onclick="return navigate('categories')">Body Care</a>
   </nav>
   <div class="header-actions">
     <button class="header-btn" onclick="toggleSearch()"><i class="fas fa-search"></i></button>
@@ -851,13 +851,13 @@ img{max-width:100%;display:block}
 <div class="mobile-nav" id="mobileNav">
   <button class="close-btn" onclick="toggleMobileNav()"><i class="fas fa-times"></i></button>
   <a href="#home" onclick="toggleMobileNav();navigate('home')">Home</a>
-  <a href="#categories" onclick="toggleMobileNav();navigate('categories')">Shop All</a>
-  <a href="#deals" onclick="toggleMobileNav();navigate('deals')">New Arrivals</a>
-  <a href="#bundles" onclick="toggleMobileNav();navigate('bundles')">Bundles</a>
-  <a href="#categories" onclick="toggleMobileNav();navigate('categories')">Beauty &amp; Makeup</a>
-  <a href="#categories" onclick="toggleMobileNav();navigate('categories')">Hair Care</a>
-  <a href="#categories" onclick="toggleMobileNav();navigate('categories')">Skincare</a>
-  <a href="#categories" onclick="toggleMobileNav();navigate('categories')">Body Care</a>
+  <a href="#categories" onclick="toggleMobileNav();return navigate('categories')">Shop All</a>
+  <a href="#deals" onclick="toggleMobileNav();return navigate('deals')">New Arrivals</a>
+  <a href="#bundles" onclick="toggleMobileNav();return navigate('bundles')">Bundles</a>
+  <a href="#categories" onclick="toggleMobileNav();return navigate('categories')">Beauty &amp; Makeup</a>
+  <a href="#categories" onclick="toggleMobileNav();return navigate('categories')">Hair Care</a>
+  <a href="#categories" onclick="toggleMobileNav();return navigate('categories')">Skincare</a>
+  <a href="#categories" onclick="toggleMobileNav();return navigate('categories')">Body Care</a>
 </div>
 <div class="cart-overlay" id="cartOverlay" onclick="toggleCart()"></div>
 
@@ -869,7 +869,7 @@ img{max-width:100%;display:block}
     <p>Shop L'Oréal, Maybelline, Nivea &amp; more — all at ElShamyGlow prices</p>
     <div class="hero-btns">
       <button class="btn btn-primary" onclick="alert('Shop!')"><i class="fas fa-shopping-bag"></i> Shop Now</button>
-      <button class="btn btn-outline" onclick="navigate('deals')">View Deals</button>
+      <button class="btn btn-outline" onclick="return navigate('deals')">View Deals</button>
     </div>
   </div>
 </section>
@@ -885,7 +885,7 @@ img{max-width:100%;display:block}
 <!-- ═══ PAGE: FLASH DEALS ═══ -->
 <div class="page-section" id="page-deals" data-page="deals">
   <section class="section" id="deals">
-    <div class="section-title">🔥 Today's Best Deals <span class="see-all" onclick="navigate('deals')">See All →</span></div>
+    <div class="section-title">🔥 Today's Best Deals <span class="see-all" onclick="return navigate('deals')">See All →</span></div>
     <div class="scroll-grid" id="flashDealsGrid"></div>
   </section>
 </div>
@@ -894,7 +894,7 @@ img{max-width:100%;display:block}
 <div class="page-section" id="page-bridal" data-page="bridal">
   <section class="bridal">
     <div class="section" style="background:transparent;padding:0">
-      <div class="section-title">Bridal Collection 💍 <span class="see-all" onclick="navigate('bridal')">See All →</span></div>
+      <div class="section-title">Bridal Collection 💍 <span class="see-all" onclick="return navigate('bridal')">See All →</span></div>
       <div class="scroll-grid" id="bridalGrid"></div>
     </div>
   </section>
@@ -912,7 +912,7 @@ img{max-width:100%;display:block}
 <div class="page-section" id="page-bundles" data-page="bundles">
   <section class="section" style="background:var(--gray);border-radius:0;max-width:100%;padding:60px 24px">
     <div style="max-width:1200px;margin:0 auto">
-      <div class="section-title">Bundle Up &amp; Save More! 💝 <span class="see-all" onclick="navigate('bundles')">See All →</span></div>
+      <div class="section-title">Bundle Up &amp; Save More! 💝 <span class="see-all" onclick="return navigate('bundles')">See All →</span></div>
       <div class="scroll-grid" id="bundleGrid"></div>
     </div>
   </section>
@@ -921,7 +921,7 @@ img{max-width:100%;display:block}
 <!-- ═══ PAGE: SHOP BY CATEGORY ═══ -->
 <div class="page-section" id="page-categories" data-page="categories">
   <section class="section">
-    <div class="section-title">Shop by Category <span class="see-all" onclick="navigate('categories')">See All →</span></div>
+    <div class="section-title">Shop by Category <span class="see-all" onclick="return navigate('categories')">See All →</span></div>
     <div class="grid-4" id="categoryGrid"></div>
   </section>
 </div>
@@ -1653,18 +1653,17 @@ function subscribe(){
 /* ═══ PAGE ROUTER ═══ */
 function navigate(page) {
   if (!page || page === 'home') {
-    window.location.hash = '';
     document.querySelectorAll('.page-section, .home-only').forEach(el => el.classList.remove('hidden'));
     document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
     document.querySelector('.nav-item[href="#home"]')?.classList.add('active');
-    return;
+    return false;
   }
-  window.location.hash = page;
   document.querySelectorAll('.page-section, .home-only').forEach(el => el.classList.add('hidden'));
   const target = document.getElementById('page-' + page);
   if (target) { target.classList.remove('hidden'); }
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
   document.querySelector('.nav-item[href="#' + page + '"]')?.classList.add('active');
+  return false;
 }
 
 window.addEventListener('hashchange', () => {
