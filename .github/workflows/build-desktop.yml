@@ -31,7 +31,7 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
-          name: GlowRX-Manager-Linux
+          name: ElshamyGlow-Manager-Linux
           path: desktop/dist/*.AppImage
 
   build-windows:
@@ -55,7 +55,7 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
-          name: GlowRX-Manager-Windows
+          name: ElshamyGlow-Manager-Windows
           path: desktop/dist/*.exe
 
   create-release:
@@ -66,7 +66,7 @@ jobs:
     steps:
       - uses: actions/download-artifact@v4
         with:
-          pattern: GlowRX-Manager-*
+          pattern: ElshamyGlow-Manager-*
           merge-multiple: true
           path: release-assets
 
@@ -81,12 +81,12 @@ jobs:
             ## Elshamy Glow Manager - برنامج إدارة المتجر
 
             ### التحميل:
-            - **Windows**: `GlowRX Manager Setup-*.exe`
-            - **Linux**: `GlowRX Manager-*.AppImage`
+            - **Windows**: `ElshamyGlow-Manager-Setup-*.exe`
+            - **Linux**: `ElshamyGlow-Manager-*.AppImage`
 
             ### طريقة الاستخدام:
             1. حمل الملف المناسب لنظامك
-            2. Linux: `chmod +x "GlowRX Manager-*.AppImage"` ثم شغله
+            2. Linux: `chmod +x "ElshamyGlow-Manager-*.AppImage"` ثم شغله
             3. Windows: شغل الـ Setup.exe ونصبه
 
             ### بيانات الدخول:
