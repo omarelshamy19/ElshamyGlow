@@ -119,6 +119,15 @@ app.use(async (req, res, next) => {
       for (const c of categoriesData) await dbRun('INSERT INTO categories (name_ar, name_en) VALUES (?, ?)', c);
     }
     if (catCount && catCount.c > 0) {
+      // Check if brands need to be populated
+      const noBrand = await dbGet("SELECT COUNT(*) as c FROM products WHERE brand IS NULL OR brand = ''");
+      if (noBrand && noBrand.c > 0) {
+        const brandMap = {};
+        productsData.forEach(p => { if (p[1] && p[10]) brandMap[p[1]] = p[10]; });
+        for (const [name, brand] of Object.entries(brandMap)) {
+          await dbRun("UPDATE products SET brand = ? WHERE name_en = ? AND (brand IS NULL OR brand = '')", [brand, name]);
+        }
+      }
       const prodWithTag = await dbGet("SELECT COUNT(*) as c FROM products WHERE tag IS NOT NULL AND tag != ''");
       if (!prodWithTag || prodWithTag.c < 5) {
         // Seed products with tags if there aren't enough tagged ones
