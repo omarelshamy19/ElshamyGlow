@@ -1665,12 +1665,12 @@ function navigate(page) {
   document.querySelector('.nav-item[data-page="' + page + '"]')?.classList.add('active');
 }
 
-document.addEventListener('click', function(e) {
-  const el = e.target.closest('[data-page]');
-  if (!el) return;
-  const page = el.getAttribute('data-page');
-  if (el.tagName === 'A') e.preventDefault();
-  navigate(page);
+document.querySelectorAll('[data-page]').forEach(function(el) {
+  el.addEventListener('click', function(e) {
+    var page = this.getAttribute('data-page');
+    if (this.tagName === 'A') e.preventDefault();
+    navigate(page);
+  });
 });
 
 window.addEventListener('hashchange', () => {
@@ -1683,8 +1683,9 @@ window.addEventListener('scroll', () => {
   document.getElementById('header').classList.toggle('scrolled', window.scrollY > 50);
 });
 
-init();
-setTimeout(() => navigate(window.location.hash.replace('#', '') || 'home'), 100);
+init().then(function() {
+  navigate(window.location.hash.replace('#', '') || 'home');
+});
 </script>
 </body>
 </html>
