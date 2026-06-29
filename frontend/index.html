@@ -86,13 +86,8 @@ img{max-width:100%;display:block}
   transition:var(--transition);
 }
 .header.scrolled{box-shadow:0 4px 20px rgba(0,0,0,0.1)}
-.header-logo{
-  font-size:1.5rem;
-  font-weight:900;
-  color:var(--rose);
-  letter-spacing:-0.5px;
-}
-.header-logo span{color:var(--gold-dark)}
+.header-logo{display:flex;align-items:center}
+.header-logo img{height:36px;width:auto;display:block}
 
 /* Nav */
 .nav{display:flex;gap:4px;align-items:center}
@@ -809,7 +804,7 @@ img{max-width:100%;display:block}
 }
 @media(max-width:480px){
   .header{padding:0 12px}
-  .header-logo{font-size:1.2rem}
+  .header-logo img{height:30px}
   .hero h1{font-size:1.3rem}
   .trust-strip{grid-template-columns:1fr 1fr}
   .prod-card{min-width:155px;max-width:155px}
@@ -829,7 +824,7 @@ img{max-width:100%;display:block}
 <!-- ═══ HEADER ═══ -->
 <header class="header" id="header">
   <button class="mobile-menu-btn" onclick="toggleMobileNav()"><i class="fas fa-bars"></i></button>
-  <a href="#" class="header-logo">ElShamy<span>Glow</span></a>
+    <a href="#" class="header-logo"><img src="logo.svg" alt="ElShamyGlow" style="height:40px;width:auto"></a>
   <nav class="nav" id="nav">
     <a href="#home" class="nav-item active" data-page="home">Home</a>
     <a href="#shop" class="nav-item" data-page="shop">Shop</a>
