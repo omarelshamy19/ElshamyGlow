@@ -676,15 +676,16 @@ img{max-width:100%;display:block}
 
 /* ═══ MOBILE NAV ═══ */
 .mobile-nav{
-  display:none;
-  position:fixed;left:-280px;top:0;bottom:0;width:280px;
+  display:block;
+  position:fixed;left:-100%;top:0;bottom:0;width:280px;
   background:var(--white);z-index:2001;
   box-shadow:4px 0 30px rgba(0,0,0,0.15);
   transition:left 0.3s ease;
   padding:24px;
   overflow-y:auto;
+  visibility:hidden;
 }
-.mobile-nav.open{left:0}
+.mobile-nav.open{left:0;visibility:visible}
 .mobile-nav .close-btn{
   background:none;border:none;font-size:1.5rem;
   cursor:pointer;margin-bottom:20px;color:var(--text);
@@ -694,6 +695,13 @@ img{max-width:100%;display:block}
   font-weight:600;font-size:14px;
   border-bottom:1px solid var(--gray);
 }
+.mobile-nav-overlay{
+  display:none;
+  position:fixed;inset:0;
+  background:rgba(0,0,0,0.5);
+  z-index:2000;
+}
+.mobile-nav-overlay.open{display:block}
 
 /* ═══ FOOTER ═══ */
 .footer{
@@ -829,6 +837,7 @@ img{max-width:100%;display:block}
 </header>
 
 <!-- ═══ MOBILE NAV ═══ -->
+<div class="mobile-nav-overlay" id="mobileNavOverlay" onclick="toggleMobileNav()"></div>
 <div class="mobile-nav" id="mobileNav">
   <button class="close-btn" onclick="toggleMobileNav()"><i class="fas fa-times"></i></button>
   <a href="#" onclick="toggleMobileNav()">Home</a>
@@ -1032,10 +1041,8 @@ img{max-width:100%;display:block}
       </div>
       <div class="form-group">
         <label>Payment Method</label>
-        <select id="checkoutPayment">
-          <option value="cod">Cash on Delivery</option>
-          <option value="card">Card Payment</option>
-        </select>
+        <input type="hidden" id="checkoutPayment" value="cod">
+        <div style="font-size:14px;font-weight:600;color:var(--text-light)">💵 Cash on Delivery</div>
       </div>
       <div class="form-group">
         <label>Notes (optional)</label>
@@ -1053,6 +1060,23 @@ img{max-width:100%;display:block}
       <p style="margin-bottom:16px">Your order has been placed successfully.</p>
       <button class="btn btn-rose" onclick="closeCheckout()">Continue Shopping</button>
     </div>
+  </div>
+</div>
+
+<!-- ═══ VERIFY MODAL ═══ -->
+<div class="modal-overlay" id="verifyModal" onclick="if(event.target===this){}">
+  <div class="modal" style="max-width:380px">
+    <button class="modal-close" onclick="closeVerify()"><i class="fas fa-times"></i></button>
+    <h2>Verify Your Email</h2>
+    <p>A verification code was sent to your email</p>
+    <div class="error" id="verifyError"></div>
+    <div class="success" id="verifySuccess"></div>
+    <div class="form-group">
+      <label>Verification Code</label>
+      <input type="text" id="verifyCode" placeholder="Enter code" maxlength="6" style="text-align:center;font-size:24px;letter-spacing:8px;font-weight:800" oninput="this.value=this.value.replace(/\D/g,'')">
+    </div>
+    <button class="btn btn-rose" onclick="doVerify()"><i class="fas fa-check"></i> Verify</button>
+    <div class="form-foot">Didn't receive code? <a onclick="resendCode()">Resend</a></div>
   </div>
 </div>
 
@@ -1131,18 +1155,22 @@ let cart = [];
 let currentLang = 'en';
 let authToken = localStorage.getItem('elshamyglow_token') || '';
 let authUser = null;
+let pendingVerifyEmail = '';
 
 /* ═══ RENDER ═══ */
 function renderProdCard(p, discount){
   const discBadge = discount ? `<div class="prod-sale-badge">-${discount}%</div>` : '';
   const soldOut = p.soldOut ? '<div class="prod-sold-out">SOLD OUT</div>' : '';
-  const origPrice = p.orig ? `<span class="orig">${p.orig.toLocaleString()} EGP</span>` : '';
+  const origPrice = p.orig ? `<span class="orig">${Number(p.orig).toLocaleString()} EGP</span>` : '';
+  const safeName = (p.name||'').replace(/'/g,"\\'");
+  const safePrice = Number(p.price||0);
+  const safeImg = p.img||'';
   return `<div class="prod-card">
-    <div class="prod-img-wrap">${discBadge}${soldOut}<img src="${p.img}" alt="${p.name}" loading="lazy"></div>
+    <div class="prod-img-wrap">${discBadge}${soldOut}<img src="${safeImg}" alt="${p.name||''}" loading="lazy" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect fill=%22%23f0f0f0%22 width=%22100%22 height=%22100%22/><text x=%2250%22 y=%2255%22 text-anchor=%22middle%22 fill=%22%23999%22 font-size=%2230%22>📦</text></svg>'"></div>
     <div class="prod-info">
-      <div class="prod-name">${p.name}</div>
-      <div class="prod-price"><span class="sale">${p.price ? p.price.toLocaleString()+' EGP' : ''}</span>${origPrice}</div>
-      ${!p.soldOut && p.price ? `<button class="add-cart" onclick='addToCart(${JSON.stringify(p).replace(/'/g,"\\'")})'>Add to Cart</button>` : ''}
+      <div class="prod-name">${p.name||''}</div>
+      <div class="prod-price"><span class="sale">${safePrice ? safePrice.toLocaleString()+' EGP' : ''}</span>${origPrice}</div>
+      ${!p.soldOut && p.price ? `<button class="add-cart" onclick="addToCart({name:'${safeName}',price:${safePrice},img:'${safeImg}'})">Add to Cart</button>` : ''}
     </div>
   </div>`;
 }
@@ -1191,7 +1219,7 @@ function init(){
         <input type="text" value="1" readonly>
         <button onclick="const i=this.previousElementSibling;i.value=parseInt(i.value)+1">+</button>
       </div>
-      <button class="btn btn-primary" onclick='addToCart(${JSON.stringify(f).replace(/'/g,"\\'")})'><i class="fas fa-shopping-bag"></i> Add to Cart</button>
+      <button class="btn btn-primary" onclick='addFeaturedToCart()'><i class="fas fa-shopping-bag"></i> Add to Cart</button>
       <a href="#" class="featured-details-link">View Full Details →</a>
     </div>`;
 
@@ -1205,11 +1233,18 @@ function init(){
 
 /* ═══ CART ═══ */
 function addToCart(product){
-  const existing = cart.find(c => c.name === product.name);
-  if(existing) existing.qty = (existing.qty||1)+1;
-  else cart.push({...product, qty:1});
+  const p = {name: product.name||'', price: product.price||0, img: product.img||product.images||'', qty: product.qty||1};
+  const existing = cart.find(c => c.name === p.name);
+  if(existing) existing.qty = (existing.qty||1) + (p.qty||1);
+  else cart.push({...p});
   saveCart();
   toggleCart();
+}
+
+function addFeaturedToCart(){
+  const qty = parseInt(document.querySelector('#featuredProduct .qty-selector input')?.value || '1');
+  const f = bundles[9];
+  addToCart({name:f.name, price:f.price, img:f.img, qty});
 }
 
 function removeFromCart(name){
@@ -1240,31 +1275,32 @@ function renderCart(){
   const badge = document.getElementById('cartBadge');
   const totalEl = document.getElementById('cartTotal');
   if(!container) return;
-  const total = cart.reduce((s,c) => s + (c.price||0)*(c.qty||1), 0);
-  const itemCount = cart.reduce((s,c) => s + (c.qty||1), 0);
+  const total = cart.reduce((s,c) => s + Number(c.price||0)*Number(c.qty||1), 0);
+  const itemCount = cart.reduce((s,c) => s + Number(c.qty||1), 0);
   count.textContent = itemCount;
   badge.textContent = itemCount;
   badge.style.display = itemCount ? 'flex' : 'none';
-  totalEl.textContent = total.toLocaleString() + ' EGP';
+  totalEl.textContent = Number(total).toLocaleString() + ' EGP';
   if(!cart.length){
     container.innerHTML = '<div class="cart-empty">Your cart is empty</div>';
     return;
   }
-  container.innerHTML = cart.map(c => `
-    <div class="cart-item">
-      <img src="${c.img}" alt="${c.name}">
+  container.innerHTML = cart.map(c => {
+    const name = (c.name||'').replace(/'/g,"\\'");
+    return `<div class="cart-item">
+      <img src="${c.img||''}" alt="${c.name||''}" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect fill=%22%23f0f0f0%22 width=%22100%22 height=%22100%22/><text x=%2250%22 y=%2255%22 text-anchor=%22middle%22 fill=%22%23999%22 font-size=%2230%22>📦</text></svg>'">
       <div class="cart-item-info">
-        <div class="name">${c.name}</div>
-        <div class="price">${c.price.toLocaleString()} EGP</div>
+        <div class="name">${c.name||'Product'}</div>
+        <div class="price">${Number(c.price||0).toLocaleString()} EGP</div>
         <div class="cart-item-qty">
-          <button onclick="updateQty('${c.name.replace(/'/g,"\\'")}',-1)">−</button>
+          <button onclick="updateQty('${name}',-1)">−</button>
           <span>${c.qty||1}</span>
-          <button onclick="updateQty('${c.name.replace(/'/g,"\\'")}',1)">+</button>
-          <button onclick="removeFromCart('${c.name.replace(/'/g,"\\'")}')" style="background:none;border:none;color:var(--sale);cursor:pointer;font-size:13px;margin-left:auto">Remove</button>
+          <button onclick="updateQty('${name}',1)">+</button>
+          <button onclick="removeFromCart('${name}')" style="background:none;border:none;color:var(--sale);cursor:pointer;font-size:13px;margin-left:auto">Remove</button>
         </div>
       </div>
-    </div>
-  `).join('');
+    </div>`;
+  }).join('');
 }
 
 function toggleCart(){
@@ -1276,6 +1312,8 @@ function toggleCart(){
 
 function toggleMobileNav(){
   document.getElementById('mobileNav').classList.toggle('open');
+  document.getElementById('mobileNavOverlay').classList.toggle('open');
+  document.body.classList.toggle('no-scroll');
 }
 
 /* ═══ API HELPER ═══ */
@@ -1326,7 +1364,7 @@ async function doSearch(q){
       el.innerHTML = products.map(p => {
         const images = (()=>{try{return JSON.parse(p.images)}catch(e){return [p.images]}})();
         const img = Array.isArray(images) ? images[0] : (images || '');
-        return `<div class="search-result-item" onclick="toggleSearch();addToCart({name:'${(p.name_en||p.name_ar||'').replace(/'/g,"\\'")}',price:${p.price},img:'${img}'})">
+        return `<div class="search-result-item" onclick="toggleSearch();addToCart({name:'${(p.name_en||p.name_ar||'').replace(/'/g,"\\'")}',price:${p.price},img:'${img||''}'})">
           <img src="${img}" alt="${p.name_en||''}">
           <div class="info"><div class="name">${p.name_en||p.name_ar||''}</div><div class="price">${p.price} EGP</div></div>
         </div>`;
@@ -1400,13 +1438,55 @@ async function doRegister(e){
   errEl.style.display = 'none';
   try{
     const data = await api('/auth/register', { method:'POST', body:JSON.stringify({name, email, password:pass, phone}) });
-    toast('Account created! Check your email for verification.', 'success');
+    authToken = data.token;
+    authUser = data.user;
+    localStorage.setItem('elshamyglow_token', authToken);
+    localStorage.setItem('elshamyglow_user', JSON.stringify(authUser));
+    document.getElementById('headerUserBtn').innerHTML = '<i class="fas fa-user-check"></i>';
+    toast('Account created! Check your email for verification code.', 'success');
     closeRegister();
-    showLogin();
+    pendingVerifyEmail = email;
+    document.getElementById('verifyCode').value = '';
+    document.getElementById('verifyError').style.display = 'none';
+    document.getElementById('verifySuccess').style.display = 'none';
+    document.getElementById('verifyModal').classList.add('open');
+    document.body.classList.add('no-scroll');
   } catch(e){
     errEl.textContent = e.message;
     errEl.style.display = 'block';
   }
+}
+
+async function doVerify(){
+  const code = document.getElementById('verifyCode').value;
+  const errEl = document.getElementById('verifyError');
+  errEl.style.display = 'none';
+  if(!code || code.length < 4){ errEl.textContent = 'Enter verification code'; errEl.style.display = 'block'; return; }
+  try{
+    const data = await api('/auth/verify-email', { method:'POST', body:JSON.stringify({code}) });
+    document.getElementById('verifySuccess').textContent = 'Email verified! ✓';
+    document.getElementById('verifySuccess').style.display = 'block';
+    authUser.email_verified = 1;
+    localStorage.setItem('elshamyglow_user', JSON.stringify(authUser));
+    setTimeout(() => { closeVerify(); }, 1500);
+  } catch(e){
+    errEl.textContent = e.message;
+    errEl.style.display = 'block';
+  }
+}
+
+async function resendCode(){
+  try{
+    const data = await api('/auth/send-verification', { method:'POST' });
+    toast('Verification code sent to your email', 'success');
+  } catch(e){
+    toast(e.message, 'error');
+  }
+}
+
+function closeVerify(){
+  document.getElementById('verifyModal').classList.remove('open');
+  document.body.classList.remove('no-scroll');
 }
 
 async function loginWithKey(){
@@ -1445,8 +1525,14 @@ async function checkout(){
   document.getElementById('checkoutDone').style.display = 'none';
   document.getElementById('checkoutSuccess').style.display = 'none';
   document.getElementById('checkoutError').style.display = 'none';
-  if(authUser){
+  if(authUser && authUser.phone){
     document.getElementById('checkoutPhone').value = authUser.phone || '';
+  } else if(authToken){
+    // Try to get user's phone from profile
+    try {
+      const userData = await api('/auth/profile');
+      if(userData.phone) document.getElementById('checkoutPhone').value = userData.phone;
+    } catch(e) {}
   }
   document.getElementById('checkoutModal').classList.add('open');
   document.body.classList.add('no-scroll');
