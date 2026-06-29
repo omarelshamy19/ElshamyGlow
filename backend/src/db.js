@@ -80,6 +80,7 @@ async function initDb() {
     if (name === 'products' && !colNames.includes('tag')) {
       await query("ALTER TABLE products ADD COLUMN tag TEXT DEFAULT ''");
     }
+    if (name === 'products' && !colNames.includes('brand')) await query("ALTER TABLE products ADD COLUMN brand TEXT DEFAULT ''");
     // Tag products that don't have a tag yet
     if (name === 'products') {
       const untagged = await query("SELECT COUNT(*) as c FROM products WHERE tag IS NULL OR tag = ''");

@@ -749,6 +749,31 @@ img{max-width:100%;display:block}
   clip: rect(0,0,0,0);
 }
 
+/* ═══ SHOP LAYOUT ═══ */
+.shop-layout{display:flex;gap:30px;max-width:1400px;margin:0 auto;padding:30px 24px;min-height:60vh}
+.shop-sidebar{width:260px;flex-shrink:0}
+.sidebar-toggle{display:none;background:var(--rose);color:#fff;border:none;padding:10px;border-radius:8px;cursor:pointer;width:100%;margin-bottom:15px;font-family:inherit}
+.sidebar-inner{background:var(--white);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow);position:sticky;top:80px}
+.filter-group{margin-bottom:20px}
+.filter-group h4{font-size:14px;color:var(--text-light);margin-bottom:8px;font-weight:600}
+.filter-group label{display:flex;align-items:center;gap:8px;padding:5px 0;cursor:pointer;font-size:14px;transition:var(--transition)}
+.filter-group label:hover{color:var(--rose)}
+.filter-group input[type="checkbox"]{accent-color:var(--rose);width:16px;height:16px}
+.price-range{display:flex;gap:8px;align-items:center}
+.price-range input{width:100%;padding:8px;border:1px solid var(--gray);border-radius:6px;font-family:inherit;font-size:13px}
+.shop-main{flex:1;min-width:0}
+.shop-header{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:20px}
+.shop-header h2{font-size:22px}
+.shop-controls{display:flex;align-items:center;gap:15px;font-size:14px;color:var(--text-light)}
+.shop-controls select{padding:6px 10px;border:1px solid var(--gray);border-radius:6px;font-family:inherit;font-size:13px;background:var(--white);cursor:pointer}
+@media(max-width:768px){
+  .shop-layout{flex-direction:column;padding:20px 16px}
+  .shop-sidebar{width:100%}
+  .sidebar-toggle{display:block}
+  .sidebar-inner{display:none}
+  .sidebar-inner.open{display:block}
+}
+
 /* ═══ RESPONSIVE ═══ */
 @media(max-width:1024px){
   .nav{display:none}
@@ -797,6 +822,7 @@ img{max-width:100%;display:block}
   <a href="#" class="header-logo">ElShamy<span>Glow</span></a>
   <nav class="nav" id="nav">
     <a href="#home" class="nav-item active" data-page="home">Home</a>
+    <a href="#shop" class="nav-item" data-page="shop">Shop</a>
     <a href="#deals" class="nav-item" data-page="deals">New Arrivals</a>
     <div class="nav-item">
       Bundles <i class="fas fa-chevron-down" style="font-size:10px;margin-left:4px"></i>
@@ -810,27 +836,27 @@ img{max-width:100%;display:block}
     <div class="nav-item">
       Beauty &amp; Makeup <i class="fas fa-chevron-down" style="font-size:10px;margin-left:4px"></i>
       <div class="nav-dropdown">
-        <a href="#cat-1" data-page="cat-1">Lipstick</a>
-        <a href="#cat-2" data-page="cat-2">Creamy Tint &amp; Blusher</a>
-        <a href="#cat-1" data-page="cat-1">Lip Care</a>
+        <a href="#shop-cat-1" data-page="shop-cat-1">Lipstick</a>
+        <a href="#shop-cat-2" data-page="shop-cat-2">Creamy Tint &amp; Blusher</a>
+        <a href="#shop-cat-1" data-page="shop-cat-1">Lip Care</a>
       </div>
     </div>
     <div class="nav-item">
       Hair Care <i class="fas fa-chevron-down" style="font-size:10px;margin-left:4px"></i>
       <div class="nav-dropdown">
-        <a href="#cat-6" data-page="cat-6">Shower Routine</a>
-        <a href="#cat-6" data-page="cat-6">Hair Oils</a>
-        <a href="#cat-6" data-page="cat-6">Hair Serum</a>
-        <a href="#cat-6" data-page="cat-6">Satin</a>
-        <a href="#cat-6" data-page="cat-6">Henna</a>
+        <a href="#shop-cat-6" data-page="shop-cat-6">Shower Routine</a>
+        <a href="#shop-cat-6" data-page="shop-cat-6">Hair Oils</a>
+        <a href="#shop-cat-6" data-page="shop-cat-6">Hair Serum</a>
+        <a href="#shop-cat-6" data-page="shop-cat-6">Satin</a>
+        <a href="#shop-cat-6" data-page="shop-cat-6">Henna</a>
       </div>
     </div>
     <div class="nav-item">
       Skincare <i class="fas fa-chevron-down" style="font-size:10px;margin-left:4px"></i>
       <div class="nav-dropdown">
-        <a href="#cat-7" data-page="cat-7">Face Soap</a>
-        <a href="#cat-4" data-page="cat-4">Night Cream</a>
-        <a href="#cat-4" data-page="cat-4">Face Serum</a>
+        <a href="#shop-cat-7" data-page="shop-cat-7">Face Soap</a>
+        <a href="#shop-cat-4" data-page="shop-cat-4">Night Cream</a>
+        <a href="#shop-cat-4" data-page="shop-cat-4">Face Serum</a>
       </div>
     </div>
   </nav>
@@ -848,11 +874,11 @@ img{max-width:100%;display:block}
   <a href="#" data-page="home" onclick="toggleMobileNav()">Home</a>
   <a href="#" data-page="deals" onclick="toggleMobileNav()">New Arrivals</a>
   <a href="#" data-page="bundles" onclick="toggleMobileNav()">Bundles</a>
-  <a href="#" data-page="cat-1" onclick="toggleMobileNav()">Lipstick</a>
-  <a href="#" data-page="cat-2" onclick="toggleMobileNav()">Creamy Tint &amp; Blusher</a>
-  <a href="#" data-page="cat-6" onclick="toggleMobileNav()">Hair Care</a>
-  <a href="#" data-page="cat-4" onclick="toggleMobileNav()">Skincare</a>
-  <a href="#" data-page="cat-7" onclick="toggleMobileNav()">Face Care</a>
+  <a href="#" data-page="shop-cat-1" onclick="toggleMobileNav()">Lipstick</a>
+  <a href="#" data-page="shop-cat-2" onclick="toggleMobileNav()">Creamy Tint &amp; Blusher</a>
+  <a href="#" data-page="shop-cat-6" onclick="toggleMobileNav()">Hair Care</a>
+  <a href="#" data-page="shop-cat-4" onclick="toggleMobileNav()">Skincare</a>
+  <a href="#" data-page="shop-cat-7" onclick="toggleMobileNav()">Face Care</a>
 </div>
 <div class="cart-overlay" id="cartOverlay" onclick="toggleCart()"></div>
 
@@ -921,6 +947,50 @@ img{max-width:100%;display:block}
     <div id="catResultsEmpty" style="display:none;text-align:center;padding:60px 20px;color:#999;font-size:18px">No products found in this category</div>
     <div style="text-align:center;margin-top:30px"><a href="#home" onclick="navigate('home')">← Back to Home</a></div>
   </section>
+</div>
+
+<!-- ═══ PAGE: SHOP (with sidebar filters) ═══ -->
+<div class="page-section" id="page-shop">
+  <div class="shop-layout">
+    <aside class="shop-sidebar" id="shopSidebar">
+      <button class="sidebar-toggle" onclick="toggleShopSidebar()"><i class="fas fa-filter"></i> Filters</button>
+      <div class="sidebar-inner">
+        <div class="filter-group">
+          <h4>Category</h4>
+          <div id="filterCategories"></div>
+        </div>
+        <div class="filter-group">
+          <h4>Brand</h4>
+          <div id="filterBrands"></div>
+        </div>
+        <div class="filter-group">
+          <h4>Price Range</h4>
+          <div class="price-range">
+            <input type="number" id="minPrice" placeholder="Min" value="" onchange="applyShopFilters()">
+            <span>—</span>
+            <input type="number" id="maxPrice" placeholder="Max" value="" onchange="applyShopFilters()">
+          </div>
+        </div>
+        <button class="btn btn-outline" onclick="clearShopFilters()" style="width:100%;margin-top:10px">Clear Filters</button>
+      </div>
+    </aside>
+    <div class="shop-main">
+      <div class="shop-header">
+        <h2 id="shopTitle">All Products</h2>
+        <div class="shop-controls">
+          <span id="shopCount"></span>
+          <select id="shopSort" onchange="applyShopFilters()">
+            <option value="newest">Newest</option>
+            <option value="price-asc">Price: Low to High</option>
+            <option value="price-desc">Price: High to Low</option>
+            <option value="name">Name</option>
+          </select>
+        </div>
+      </div>
+      <div class="grid-4" id="shopGrid"></div>
+      <div id="shopEmpty" style="display:none;text-align:center;padding:60px 20px;color:#999">No products match your filters</div>
+    </div>
+  </div>
 </div>
 
 <!-- ═══ WHY US ═══ -->
@@ -1211,6 +1281,91 @@ function renderFeatured(p){
       <button class="btn btn-primary" onclick='addFeaturedToCart()'><i class="fas fa-shopping-bag"></i> Add to Cart</button>
       <a href="#" class="featured-details-link">View Full Details →</a>
     </div>`;
+}
+
+/* ═══ SHOP FUNCTIONS ═══ */
+let shopFilters = { category: [], brand: [], minPrice: '', maxPrice: '', sort: 'newest', search: '' };
+
+function toggleShopSidebar() {
+  document.querySelector('.sidebar-inner')?.classList.toggle('open');
+}
+
+async function loadShop(filters) {
+  const grid = document.getElementById('shopGrid');
+  const title = document.getElementById('shopTitle');
+  const count = document.getElementById('shopCount');
+  const empty = document.getElementById('shopEmpty');
+  if (!grid) return;
+  shopFilters = { ...shopFilters, ...filters };
+  grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:#999">Loading...</div>';
+  empty.style.display = 'none';
+  try {
+    let url = '/products?';
+    const params = [];
+    if (shopFilters.category.length) params.push('category=' + shopFilters.category.join(','));
+    if (shopFilters.brand.length) params.push('brand=' + shopFilters.brand.join(','));
+    if (shopFilters.minPrice) params.push('min_price=' + shopFilters.minPrice);
+    if (shopFilters.maxPrice) params.push('max_price=' + shopFilters.maxPrice);
+    if (shopFilters.search) params.push('search=' + encodeURIComponent(shopFilters.search));
+    url += params.join('&');
+    const data = await api(url);
+    let products = data.products || [];
+    // Sort
+    if (shopFilters.sort === 'price-asc') products.sort((a,b) => (a.price||0) - (b.price||0));
+    else if (shopFilters.sort === 'price-desc') products.sort((a,b) => (b.price||0) - (a.price||0));
+    else if (shopFilters.sort === 'name') products.sort((a,b) => (a.name_en||'').localeCompare(b.name_en||''));
+    const total = products.length;
+    count.textContent = total + ' product' + (total !== 1 ? 's' : '');
+    if (shopFilters.search) title.textContent = 'Search: "' + shopFilters.search + '"';
+    else if (shopFilters.category.length === 1) {
+      const cat = (data.categories||[]).find(c => c.id == shopFilters.category[0]);
+      title.textContent = cat ? (cat.name_en || cat.name_ar) : 'Shop';
+    } else title.textContent = 'All Products';
+    if (total) {
+      grid.innerHTML = products.map(p => renderProdCard(p)).join('');
+    } else {
+      grid.innerHTML = '';
+      empty.style.display = 'block';
+    }
+  } catch(e) {
+    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--sale)">Failed to load products</div>';
+  }
+}
+
+function applyShopFilters() {
+  const cats = Array.from(document.querySelectorAll('#filterCategories input:checked')).map(c => c.value);
+  const brands = Array.from(document.querySelectorAll('#filterBrands input:checked')).map(c => c.value);
+  const minPrice = document.getElementById('minPrice')?.value || '';
+  const maxPrice = document.getElementById('maxPrice')?.value || '';
+  const sort = document.getElementById('shopSort')?.value || 'newest';
+  loadShop({ category: cats, brand: brands, minPrice, maxPrice, sort });
+}
+
+function clearShopFilters() {
+  document.querySelectorAll('#filterCategories input, #filterBrands input').forEach(c => c.checked = false);
+  document.getElementById('minPrice').value = '';
+  document.getElementById('maxPrice').value = '';
+  applyShopFilters();
+}
+
+async function loadFilterOptions() {
+  const catContainer = document.getElementById('filterCategories');
+  const brandContainer = document.getElementById('filterBrands');
+  if (!catContainer || !brandContainer) return;
+  try {
+    const data = await api('/products');
+    if (data.categories) {
+      catContainer.innerHTML = data.categories.map(c =>
+        '<label><input type="checkbox" value="' + c.id + '" onchange="applyShopFilters()"> ' + (c.name_en || c.name_ar) + '</label>'
+      ).join('');
+    }
+    const brands = await api('/products/brands');
+    if (brands.brands) {
+      brandContainer.innerHTML = brands.brands.map(b =>
+        '<label><input type="checkbox" value="' + b + '" onchange="applyShopFilters()"> ' + b + '</label>'
+      ).join('');
+    }
+  } catch(e) { console.error('Failed to load filters', e); }
 }
 
 async function loadCategoryProducts(catId){
@@ -1670,14 +1825,26 @@ function navigate(page) {
     return;
   }
   document.querySelectorAll('.page-section, .home-only').forEach(el => el.classList.add('hidden'));
-  // Handle category filter pages (cat-{id})
-  if (page.startsWith('cat-')) {
+  // Handle legacy category filter pages (cat-{id})
+  if (page.startsWith('cat-') && !page.startsWith('cat-results')) {
     const catId = page.replace('cat-', '');
     const target = document.getElementById('page-cat-results');
     if (target) { target.classList.remove('hidden'); }
     loadCategoryProducts(catId);
     document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
     document.querySelector('.nav-item[data-page="' + page + '"]')?.classList.add('active');
+    return;
+  }
+  // Handle shop & shop-cat-* pages
+  if (page === 'shop' || page.startsWith('shop-')) {
+    const target = document.getElementById('page-shop');
+    if (target) { target.classList.remove('hidden'); }
+    loadFilterOptions();
+    const params = {};
+    if (page.startsWith('shop-cat-')) params.category = [page.replace('shop-cat-', '')];
+    else if (page.startsWith('shop-brand-')) params.brand = [page.replace('shop-brand-', '')];
+    loadShop(params);
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
     return;
   }
   const target = document.getElementById('page-' + page);
