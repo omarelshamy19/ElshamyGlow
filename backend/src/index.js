@@ -100,7 +100,12 @@ app.use(async (req, res, next) => {
         for (const c of categoriesData) await dbRun('INSERT INTO categories (name_ar, name_en) VALUES (?, ?)', c);
       }
       const prodCount = await dbGet("SELECT COUNT(*) as c FROM products");
-      if (!prodCount || prodCount.c === 0) {
+      const untaggedCount = await dbGet("SELECT COUNT(*) as c FROM products WHERE tag IS NULL OR tag = ''");
+      if (!prodCount || prodCount.c === 0 || (untaggedCount && untaggedCount.c > 2)) {
+        // Delete existing untagged products if reseeding
+        if (prodCount && prodCount.c > 0 && untaggedCount && untaggedCount.c > 2) {
+          await dbRun("DELETE FROM products WHERE tag IS NULL OR tag = ''");
+        }
         const cats = await dbAll("SELECT id, name_en FROM categories");
         const catMap = {};
         const catNames = ['Lipstick', 'Eye Makeup', 'Foundation & Concealer', 'Skincare', 'Perfumes', 'Hair Care', 'Face Care'];
