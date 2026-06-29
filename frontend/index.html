@@ -1158,6 +1158,8 @@ let authToken = localStorage.getItem('elshamyglow_token') || '';
 let authUser = null;
 let pendingVerifyEmail = '';
 let pendingVerifyCode = '';
+let pendingLoginPass = '';
+let tempToken = '';
 
 /* ═══ RENDER ═══ */
 function renderProdCard(p, discount){
@@ -1321,7 +1323,8 @@ function toggleMobileNav(){
 /* ═══ API HELPER ═══ */
 async function api(path, opts = {}){
   const headers = { 'Content-Type': 'application/json', ...opts.headers };
-  if(authToken) headers['Authorization'] = 'Bearer ' + authToken;
+  const token = authToken || tempToken;
+  if(token) headers['Authorization'] = 'Bearer ' + token;
   const res = await fetch(API + path, { ...opts, headers });
   const data = await res.json();
   if(!res.ok) throw new Error(data.error || 'Request failed');
@@ -1417,31 +1420,33 @@ async function doLogin(e){
   errEl.style.display = 'none';
   try{
     const data = await api('/auth/login', { method:'POST', body:JSON.stringify({email, password:pass}) });
-    authToken = data.token;
-    authUser = data.user || { email };
-    localStorage.setItem('elshamyglow_token', authToken);
-    localStorage.setItem('elshamyglow_user', JSON.stringify(authUser));
-    document.getElementById('headerUserBtn').innerHTML = '<i class="fas fa-user-check"></i>';
     closeLogin();
-    if(authUser.email_verified === 0){
-      toast('Please verify your email. Code sent!', 'info');
+    if(data.user && data.user.email_verified === 0){
       pendingVerifyEmail = email;
+      pendingLoginPass = pass;
+      tempToken = data.token;
       document.getElementById('verifyCode').value = '';
       document.getElementById('verifyError').style.display = 'none';
       document.getElementById('verifySuccess').style.display = 'none';
       document.getElementById('verifyCodeDisplay').style.display = 'none';
       document.getElementById('verifyModal').classList.add('open');
       document.body.classList.add('no-scroll');
+      toast('Please verify your email first', 'info');
       try {
         const r = await api('/auth/send-verification', { method:'POST' });
-        if(r.code){ pendingVerifyCode = r.code; document.getElementById('verifyCodeDisplay').textContent = 'Code: ' + r.code; document.getElementById('verifyCodeDisplay').style.display = 'block'; }
+        if(r.code){ pendingVerifyCode = r.code; document.getElementById('verifyCodeDisplay').textContent = '📋 Code: ' + r.code; document.getElementById('verifyCodeDisplay').style.display = 'block'; console.log('Verify code:', r.code); }
         else toast('Verification code sent to your email!', 'success');
       } catch(e2) {
         toast('Could not send code: ' + e2.message, 'error');
       }
-    } else {
-      toast('Welcome back, ' + (authUser.name || email) + '!', 'success');
+      return;
     }
+    authToken = data.token;
+    authUser = data.user || { email };
+    localStorage.setItem('elshamyglow_token', authToken);
+    localStorage.setItem('elshamyglow_user', JSON.stringify(authUser));
+    document.getElementById('headerUserBtn').innerHTML = '<i class="fas fa-user-check"></i>';
+    toast('Welcome back, ' + (authUser.name || email) + '!', 'success');
   } catch(e){
     errEl.textContent = e.message;
     errEl.style.display = 'block';
@@ -1458,22 +1463,20 @@ async function doRegister(e){
   errEl.style.display = 'none';
   try{
     const data = await api('/auth/register', { method:'POST', body:JSON.stringify({name, email, password:pass, phone}) });
-    authToken = data.token;
-    authUser = data.user;
-    localStorage.setItem('elshamyglow_token', authToken);
-    localStorage.setItem('elshamyglow_user', JSON.stringify(authUser));
-    document.getElementById('headerUserBtn').innerHTML = '<i class="fas fa-user-check"></i>';
     closeRegister();
     pendingVerifyEmail = email;
+    pendingLoginPass = pass;
+    tempToken = data.token;
     document.getElementById('verifyCode').value = '';
     document.getElementById('verifyError').style.display = 'none';
     document.getElementById('verifySuccess').style.display = 'none';
     document.getElementById('verifyCodeDisplay').style.display = 'none';
     document.getElementById('verifyModal').classList.add('open');
     document.body.classList.add('no-scroll');
+    toast('Account created! Check your email or use code below', 'info');
     try {
       const r = await api('/auth/send-verification', { method:'POST' });
-      if(r.code){ pendingVerifyCode = r.code; document.getElementById('verifyCodeDisplay').textContent = 'Code: ' + r.code; document.getElementById('verifyCodeDisplay').style.display = 'block'; }
+      if(r.code){ pendingVerifyCode = r.code; document.getElementById('verifyCodeDisplay').textContent = '📋 Code: ' + r.code; document.getElementById('verifyCodeDisplay').style.display = 'block'; console.log('Verify code:', r.code); }
       else toast('Verification code sent to your email!', 'success');
     } catch(e2) {
       toast('Could not send code: ' + e2.message, 'error');
@@ -1490,12 +1493,26 @@ async function doVerify(){
   errEl.style.display = 'none';
   if(!code || code.length < 4){ errEl.textContent = 'Enter verification code'; errEl.style.display = 'block'; return; }
   try{
-    const data = await api('/auth/verify-email', { method:'POST', body:JSON.stringify({code}) });
+    await api('/auth/verify-email', { method:'POST', body:JSON.stringify({code}) });
     document.getElementById('verifySuccess').textContent = 'Email verified! ✓';
     document.getElementById('verifySuccess').style.display = 'block';
-    authUser.email_verified = 1;
-    localStorage.setItem('elshamyglow_user', JSON.stringify(authUser));
-    setTimeout(() => { closeVerify(); }, 1500);
+    setTimeout(async () => {
+      closeVerify();
+      // Login now that email is verified
+      try {
+        const data = await api('/auth/login', { method:'POST', body:JSON.stringify({email: pendingVerifyEmail, password: pendingLoginPass}) });
+        authToken = data.token;
+        authUser = data.user || { email: pendingVerifyEmail };
+        localStorage.setItem('elshamyglow_token', authToken);
+        localStorage.setItem('elshamyglow_user', JSON.stringify(authUser));
+        document.getElementById('headerUserBtn').innerHTML = '<i class="fas fa-user-check"></i>';
+        toast('Email verified! Welcome!', 'success');
+      } catch(e) {
+        toast('Verification done! Please login.', 'success');
+        showLogin();
+      }
+      pendingLoginPass = '';
+    }, 1000);
   } catch(e){
     errEl.textContent = e.message;
     errEl.style.display = 'block';
