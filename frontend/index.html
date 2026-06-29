@@ -812,29 +812,29 @@ img{max-width:100%;display:block}
       Beauty &amp; Makeup <i class="fas fa-chevron-down" style="font-size:10px;margin-left:4px"></i>
       <div class="nav-dropdown">
         <a href="#categories" data-page="categories">All</a>
-        <a href="#categories" data-page="categories">Lipstick</a>
-        <a href="#categories" data-page="categories">Creamy Tint &amp; Blusher</a>
-        <a href="#categories" data-page="categories">Lip Care</a>
+        <a href="#cat-1" data-page="cat-1">Lipstick</a>
+        <a href="#cat-2" data-page="cat-2">Creamy Tint &amp; Blusher</a>
+        <a href="#cat-1" data-page="cat-1">Lip Care</a>
       </div>
     </div>
     <div class="nav-item">
       Hair Care <i class="fas fa-chevron-down" style="font-size:10px;margin-left:4px"></i>
       <div class="nav-dropdown">
         <a href="#categories" data-page="categories">All</a>
-        <a href="#categories" data-page="categories">Shower Routine</a>
-        <a href="#categories" data-page="categories">Hair Oils</a>
-        <a href="#categories" data-page="categories">Hair Serum</a>
-        <a href="#categories" data-page="categories">Satin</a>
-        <a href="#categories" data-page="categories">Henna</a>
+        <a href="#cat-6" data-page="cat-6">Shower Routine</a>
+        <a href="#cat-6" data-page="cat-6">Hair Oils</a>
+        <a href="#cat-6" data-page="cat-6">Hair Serum</a>
+        <a href="#cat-6" data-page="cat-6">Satin</a>
+        <a href="#cat-6" data-page="cat-6">Henna</a>
       </div>
     </div>
     <div class="nav-item">
       Skincare <i class="fas fa-chevron-down" style="font-size:10px;margin-left:4px"></i>
       <div class="nav-dropdown">
         <a href="#categories" data-page="categories">All</a>
-        <a href="#categories" data-page="categories">Face Soap</a>
-        <a href="#categories" data-page="categories">Night Cream</a>
-        <a href="#categories" data-page="categories">Face Serum</a>
+        <a href="#cat-7" data-page="cat-7">Face Soap</a>
+        <a href="#cat-4" data-page="cat-4">Night Cream</a>
+        <a href="#cat-4" data-page="cat-4">Face Serum</a>
       </div>
     </div>
     <a href="#categories" class="nav-item" data-page="categories">Body Care</a>
@@ -923,6 +923,16 @@ img{max-width:100%;display:block}
   <section class="section">
     <div class="section-title">Shop by Category <span class="see-all" data-page="categories">See All →</span></div>
     <div class="grid-4" id="categoryGrid"></div>
+  </section>
+</div>
+
+<!-- ═══ PAGE: CATEGORY RESULTS (dynamic, filtered by category_id) ═══ -->
+<div class="page-section" id="page-cat-results">
+  <section class="section">
+    <div class="section-title" id="catResultsTitle">Category</div>
+    <div class="grid-4" id="catResultsGrid"></div>
+    <div id="catResultsEmpty" style="display:none;text-align:center;padding:60px 20px;color:#999;font-size:18px">No products found in this category</div>
+    <div style="text-align:center;margin-top:30px"><a href="#categories" onclick="navigate('categories')">← Back to all categories</a></div>
   </section>
 </div>
 
@@ -1220,8 +1230,30 @@ function renderCategories(cats){
   const grid = document.getElementById('categoryGrid');
   if(!grid) return;
   grid.innerHTML = (cats || []).map(c =>
-    `<div class="cat-card"><img src="${c.image||''}" alt="${c.name_en||c.name_ar||''}" loading="lazy"><div class="cat-name">${c.name_en||c.name_ar||''}</div></div>`
+    `<div class="cat-card" onclick="navigate('cat-${c.id}')"><img src="${c.image||''}" alt="${c.name_en||c.name_ar||''}" loading="lazy"><div class="cat-name">${c.name_en||c.name_ar||''}</div></div>`
   ).join('');
+}
+
+async function loadCategoryProducts(catId){
+  const grid = document.getElementById('catResultsGrid');
+  const title = document.getElementById('catResultsTitle');
+  const empty = document.getElementById('catResultsEmpty');
+  if(!grid) return;
+  grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:#999">Loading...</div>';
+  empty.style.display = 'none';
+  try {
+    const data = await api('/products?category=' + catId);
+    const catName = (data.categories||[]).find(c => c.id == catId);
+    title.textContent = (catName ? (catName.name_ar || catName.name_en) : 'Category');
+    if(data.products && data.products.length){
+      grid.innerHTML = data.products.map(p => renderProdCard(p)).join('');
+    } else {
+      grid.innerHTML = '';
+      empty.style.display = 'block';
+    }
+  } catch(e){
+    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--sale)">Failed to load products</div>';
+  }
 }
 
 async function init(){
@@ -1659,6 +1691,16 @@ function navigate(page) {
     return;
   }
   document.querySelectorAll('.page-section, .home-only').forEach(el => el.classList.add('hidden'));
+  // Handle category filter pages (cat-{id})
+  if (page.startsWith('cat-')) {
+    const catId = page.replace('cat-', '');
+    const target = document.getElementById('page-cat-results');
+    if (target) { target.classList.remove('hidden'); }
+    loadCategoryProducts(catId);
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    document.querySelector('.nav-item[data-page="' + page + '"]')?.classList.add('active');
+    return;
+  }
   const target = document.getElementById('page-' + page);
   if (target) { target.classList.remove('hidden'); }
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
