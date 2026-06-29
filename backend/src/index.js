@@ -95,17 +95,33 @@ app.use(async (req, res, next) => {
   if (!ready) {
     try {
       await initDb();
-      const catCount = await dbGet("SELECT COUNT(*) as c FROM categories");
-      if (!catCount || catCount.c === 0) {
-        for (const c of categoriesData) await dbRun('INSERT INTO categories (name_ar, name_en) VALUES (?, ?)', c);
-      }
-      const prodCount = await dbGet("SELECT COUNT(*) as c FROM products");
-      const untaggedCount = await dbGet("SELECT COUNT(*) as c FROM products WHERE tag IS NULL OR tag = ''");
-      if (!prodCount || prodCount.c === 0 || (untaggedCount && untaggedCount.c > 2)) {
-        // Delete existing untagged products if reseeding
-        if (prodCount && prodCount.c > 0 && untaggedCount && untaggedCount.c > 2) {
-          await dbRun("DELETE FROM products WHERE tag IS NULL OR tag = ''");
-        }
+      ready = true;
+    } catch (e) {
+      console.error('Init error:', e.message, e.stack?.split('\n')[0]);
+      return res.status(500).json({ error: 'Init failed: ' + e.message });
+    }
+  }
+  next();
+});
+
+// Seed check runs on every cold start (but only seeds if needed)
+app.use(async (req, res, next) => {
+  try {
+    const adminExists = await dbGet("SELECT id FROM users WHERE role = 'admin'");
+    if (!adminExists) {
+      const adminEmail = process.env.ADMIN_EMAIL || 'omarelshamy1197@gmail.com';
+      const adminPass = process.env.ADMIN_PASSWORD || 'admin123';
+      const hashed = require('bcryptjs').hashSync(adminPass, 10);
+      await dbRun("INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, 'admin')", ['Admin', adminEmail, hashed]);
+    }
+    const catCount = await dbGet("SELECT COUNT(*) as c FROM categories");
+    if (!catCount || catCount.c === 0) {
+      for (const c of categoriesData) await dbRun('INSERT INTO categories (name_ar, name_en) VALUES (?, ?)', c);
+    }
+    if (catCount && catCount.c > 0) {
+      const prodWithTag = await dbGet("SELECT COUNT(*) as c FROM products WHERE tag IS NOT NULL AND tag != ''");
+      if (!prodWithTag || prodWithTag.c < 5) {
+        // Seed products with tags if there aren't enough tagged ones
         const cats = await dbAll("SELECT id, name_en FROM categories");
         const catMap = {};
         const catNames = ['Lipstick', 'Eye Makeup', 'Foundation & Concealer', 'Skincare', 'Perfumes', 'Hair Care', 'Face Care'];
@@ -113,6 +129,8 @@ app.use(async (req, res, next) => {
           const found = cats.find(c => c.name_en === n);
           catMap[i + 1] = found ? found.id : null;
         });
+        // Delete untagged products
+        await dbRun("DELETE FROM products WHERE tag IS NULL OR tag = ''");
         for (const p of productsData) {
           const mappedP = [...p];
           if (mappedP[6] && catMap[mappedP[6]]) mappedP[6] = catMap[mappedP[6]];
@@ -120,18 +138,9 @@ app.use(async (req, res, next) => {
           await dbRun('INSERT INTO products (name_ar, name_en, description_ar, description_en, price, stock, category_id, featured, images, tag) VALUES (?,?,?,?,?,?,?,?,?,?)', mappedP);
         }
       }
-      const adminExists = await dbGet("SELECT id FROM users WHERE role = 'admin'");
-      if (!adminExists) {
-        const adminEmail = process.env.ADMIN_EMAIL || 'omarelshamy1197@gmail.com';
-        const adminPass = process.env.ADMIN_PASSWORD || 'admin123';
-        const hashed = require('bcryptjs').hashSync(adminPass, 10);
-        await dbRun("INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, 'admin')", ['Admin', adminEmail, hashed]);
-      }
-      ready = true;
-    } catch (e) {
-      console.error('Init error:', e.message, e.stack?.split('\n')[0]);
-      return res.status(500).json({ error: 'Init failed: ' + e.message });
     }
+  } catch (e) {
+    console.error('Seed error:', e.message);
   }
   next();
 });
