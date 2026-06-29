@@ -517,7 +517,7 @@ select.status-select{
     </div>
     <div class="form-row">
       <div class="form-group"><label>مميز</label><select id="pFeatured"><option value="0">لا</option><option value="1">نعم</option></select></div>
-      <div class="form-group"><label></label></div>
+      <div class="form-group"><label>قسم العرض</label><select id="pTag"><option value="">— عادي —</option><option value="flash_deal">Flash Deal</option><option value="bridal">Bridal</option><option value="bundle">Bundle</option><option value="featured">Featured</option></select></div>
     </div>
     <div class="form-group"><label>الصور (رابط لكل سطر)</label><textarea id="pImages" placeholder="https://images.unsplash.com/photo-..."></textarea></div>
     <div class="form-group"><label>أو ارفع صورة</label>
@@ -583,7 +583,7 @@ select.status-select{
 <div class="modal-overlay" id="importModal">
   <div class="modal" style="max-width:600px">
     <h3>📥 ${t('استيراد منتجات','Import Products')}</h3>
-    <p style="font-size:13px;color:var(--text2);margin-bottom:12px">${t('الصق بيانات CSV بالأعمدة التالية','Paste CSV data with columns')}: <code style="background:var(--bg);padding:2px 6px;border-radius:4px;font-size:12px">name_ar, name_en, price, stock, sku, description_ar, description_en, category_name_en, featured</code></p>
+    <p style="font-size:13px;color:var(--text2);margin-bottom:12px">${t('الصق بيانات CSV بالأعمدة التالية','Paste CSV data with columns')}: <code style="background:var(--bg);padding:2px 6px;border-radius:4px;font-size:12px">name_ar, name_en, price, stock, sku, description_ar, description_en, category_name_en, featured, tag</code></p>
     <div class="form-group"><label>${t('بيانات CSV','CSV Data')}</label>
       <textarea id="csvInput" rows="8" style="font-family:monospace;font-size:12px" placeholder="name_ar,name_en,price,stock,sku
 أحمر شفاه,Red Lipstick,120,50,GRX-LIP-001
@@ -972,7 +972,7 @@ async function loadProducts() {
     if (lowStockFilter) products = products.filter(p => p.stock <= 5);
     if (!products.length) { document.getElementById('productsTable').innerHTML = '<div class="empty-state"><div class="empty-icon">🛍️</div><p>' + t('لا توجد منتجات','No products') + '</p></div>'; return; }
     document.getElementById('productsTable').innerHTML = `<div class="table-wrap"><table>
-      <tr><th>#</th><th>${t('الصورة','Image')}</th><th>${t('الاسم','Name')}</th><th>${t('SKU','SKU')}</th><th>${t('السعر','Price')}</th><th>${t('المخزون','Stock')}</th><th>${t('القسم','Category')}</th><th>${t('مميز','Featured')}</th><th></th></tr>
+      <tr><th>#</th><th>${t('الصورة','Image')}</th><th>${t('الاسم','Name')}</th><th>${t('SKU','SKU')}</th><th>${t('السعر','Price')}</th><th>${t('المخزون','Stock')}</th><th>${t('القسم','Category')}</th><th>${t('مميز','Featured')}</th><th>Tag</th><th></th></tr>
       ${products.map(p => {
         const imgs = (() => { try { return JSON.parse(p.images||'[]'); } catch { return []; } })();
         const skuDisplay = p.sku || '—';
@@ -984,6 +984,7 @@ async function loadProducts() {
         <td style="font-weight:600;color:var(--primary)">${Math.round(p.price)} EGP</td><td><span class="${p.stock <= 5 ? 'badge low-stock' : ''}">${p.stock} ${p.stock <= 5 ? '⚠️' : ''}</span></td>
         <td>${esc(lang === 'ar' ? (p.category_ar||'—') : (p.category_en||'—'))}</td>
         <td>${p.featured ? '⭐' : '—'}</td>
+        <td style="font-size:11px;color:var(--text2)">${p.tag ? esc(p.tag) : '—'}</td>
         <td><button class="btn btn-sm btn-outline" onclick="openProductModal(${p.id})">✏️</button> <button class="btn btn-sm" style="background:var(--danger);color:#fff;padding:4px 10px;border:none;border-radius:6px;cursor:pointer;font-size:12px" onclick="deleteProduct(${p.id})">🗑️</button></td>
       </tr>`}).join('')}
     </table></div>`;
@@ -995,6 +996,7 @@ async function openProductModal(id = null) {
   document.getElementById('productModalTitle').textContent = id ? t('تعديل المنتج','Edit Product') : t('إضافة منتج جديد','Add New Product');
   ['pNameAr','pNameEn','pDescAr','pDescEn','pPrice','pStock','pImages','pSku','pVariants'].forEach(f => { const el = document.getElementById(f); if (el) el.value = ''; });
   document.getElementById('pFeatured').value = '0';
+  document.getElementById('pTag').value = '';
   document.getElementById('pImagePreview').style.display = 'none';
   document.getElementById('pImageUpload').value = '';
   document.getElementById('pImageName').textContent = '';
@@ -1005,7 +1007,7 @@ async function openProductModal(id = null) {
       if (p) { const fm = {pNameAr:'name_ar',pNameEn:'name_en',pDescAr:'description_ar',pDescEn:'description_en'}; Object.entries(fm).forEach(([id,key]) => document.getElementById(id).value = p[key]||'');
         document.getElementById('pPrice').value = p.price; document.getElementById('pStock').value = p.stock;
         document.getElementById('pSku').value = p.sku||'';
-        document.getElementById('pCategory').value = p.category_id; document.getElementById('pFeatured').value = p.featured;
+        document.getElementById('pCategory').value = p.category_id; document.getElementById('pFeatured').value = p.featured; document.getElementById('pTag').value = p.tag || '';
         document.getElementById('pImages').value = (p.images ? (Array.isArray(p.images) ? p.images : JSON.parse(p.images||'[]')) : []).join('\n');
         document.getElementById('pVariants').value = p.variants ? JSON.stringify(p.variants, null, 2) : '[]'; }
     } catch(e) { showToast(e.message, 'error'); }
@@ -1065,6 +1067,7 @@ async function saveProduct() {
     description_ar: document.getElementById('pDescAr').value, description_en: document.getElementById('pDescEn').value,
     price: parseFloat(document.getElementById('pPrice').value), stock: parseInt(document.getElementById('pStock').value)||0,
     category_id: parseInt(document.getElementById('pCategory').value), featured: parseInt(document.getElementById('pFeatured').value),
+    tag: document.getElementById('pTag').value || '',
     sku: document.getElementById('pSku').value || null,
     images: document.getElementById('pImages').value.split('\n').filter(s=>s.trim()) };
   try {
