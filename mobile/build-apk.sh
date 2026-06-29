@@ -4,11 +4,19 @@ export NVM_DIR="$HOME/.nvm"
 nvm use 22
 export ANDROID_HOME="$HOME/Android/Sdk"
 
-cd /media/Data1/opencode/cosmetics-store/mobile/android
+DIR="$(cd "$(dirname "$0")" && pwd)"
+cd "$DIR"
+
+echo "Generating JS bundle..."
+npx expo export --platform android --output-dir /tmp/expo-bundle-$$
+mkdir -p android/app/src/main/assets
+cp /tmp/expo-bundle-$$/_expo/static/js/android/*.hbc android/app/src/main/assets/index.android.bundle
+rm -rf /tmp/expo-bundle-$$
 
 echo "Building APK... (first time may take 10-15 minutes)"
-./gradlew assembleRelease 2>&1
+cd android
+./gradlew assembleDebug 2>&1
 
 echo ""
 echo "=== If build succeeded, APK is at: ==="
-echo "$(pwd)/app/build/outputs/apk/release/app-release.apk"
+echo "$(pwd)/app/build/outputs/apk/debug/app-debug.apk"
