@@ -51,6 +51,52 @@
   --shadow:0 2px 12px rgba(0,0,0,0.3);
   --shadow-hover:0 8px 30px rgba(0,0,0,0.5);
 }
+.dark .header{background:#1A1A1A;border-bottom:1px solid #2A2A2A}
+.dark .section{background:#1E1E1E}
+.dark .hero{background:linear-gradient(135deg,#1A1A1A 0%,#2A2A2A 100%)}
+.dark .hero h1,.dark .hero p{color:#E0E0E0}
+.dark .hero-badge{background:rgba(194,24,91,0.2);color:var(--rose-light)}
+.dark .nav-dropdown{background:#1E1E1E;border:1px solid #333}
+.dark .nav-dropdown a{color:#ccc}
+.dark .nav-dropdown a:hover{background:#2A2A2A;color:#fff}
+.dark .trust-strip{background:#1A1A1A}
+.dark .prod-card{background:#1E1E1E;border:1px solid #2A2A2A}
+.dark .prod-name{color:#E0E0E0}
+.dark .prod-price{color:#E0E0E0}
+.dark .footer{background:#1A1A1A;border-top:1px solid #2A2A2A}
+.dark .footer h3,.dark .footer a,.dark .footer p{color:#ccc}
+.dark .footer .brand span{color:var(--gold-dark)}
+.dark .subscribe{background:#1A1A1A}
+.dark .subscribe h2{color:#E0E0E0}
+.dark .subscribe-form input{background:#2A2A2A;border-color:#333;color:#E0E0E0}
+.dark .cart-overlay.open{background:rgba(0,0,0,0.7)}
+.dark .cart-drawer{background:#1E1E1E;border-left:1px solid #333}
+.dark .cart-item{border-bottom:1px solid #2A2A2A}
+.dark .why-card{background:#2A2A2A}
+.dark .why-card h3{color:#E0E0E0}
+.dark .why-card p{color:#999}
+.dark .modal{background:rgba(0,0,0,0.7)}
+.dark .modal-content{background:#1E1E1E}
+.dark .modal-content h2{color:#E0E0E0}
+.dark .modal-content input,.dark .modal-content select,.dark .modal-content textarea{background:#2A2A2A;border-color:#333;color:#E0E0E0}
+.dark .form-foot{color:#999}
+.dark .form-foot a{color:var(--rose-light)}
+.dark .search-overlay{background:rgba(0,0,0,0.9)}
+.dark .search-overlay input{background:#2A2A2A;border-color:#333;color:#E0E0E0}
+.dark .toast{background:#333;color:#E0E0E0}
+.dark .section-title{color:#E0E0E0}
+.dark .see-all{color:var(--rose-light)}
+.dark .login-tabs button{color:#999}
+.dark .login-tabs button.active{color:var(--rose-light);border-bottom-color:var(--rose-light)}
+.dark .header-btn{color:#ccc}
+.dark .header-logo img{filter:brightness(1.2)}
+.dark .mobile-nav{background:#1E1E1E}
+.dark .mobile-nav a{color:#ccc}
+.dark .mobile-nav a:hover{background:#2A2A2A;color:#fff}
+.dark .shop-sidebar .sidebar-inner{background:#1E1E1E;border:1px solid #333}
+.dark .shop-controls select{background:#2A2A2A;border-color:#333;color:#E0E0E0}
+.dark .filter-group label{color:#ccc}
+.dark .price-range input{background:#2A2A2A;border-color:#333;color:#E0E0E0}
 html{scroll-behavior:smooth}
 body{
   font-family:'Cairo',sans-serif;
@@ -83,7 +129,7 @@ img{max-width:100%;display:block}
   background:var(--white);
   box-shadow:0 1px 3px rgba(0,0,0,0.06);
   padding:0 24px;
-  height:72px;
+  height:110px;
   display:flex;
   align-items:center;
   justify-content:space-between;
@@ -91,7 +137,7 @@ img{max-width:100%;display:block}
 }
 .header.scrolled{box-shadow:0 4px 20px rgba(0,0,0,0.1)}
 .header-logo{display:flex;align-items:center}
-.header-logo img{height:50px;width:auto;display:block}
+.header-logo img{height:90px;width:auto;display:block}
 
 /* Nav */
 .nav{display:flex;gap:4px;align-items:center}
@@ -826,7 +872,7 @@ img{max-width:100%;display:block}
 }
 @media(max-width:480px){
   .header{padding:0 12px}
-  .header-logo img{height:40px}
+  .header-logo img{height:70px}
   .hero h1{font-size:1.3rem}
   .trust-strip{grid-template-columns:1fr 1fr}
   .prod-card{min-width:155px;max-width:155px}
@@ -846,7 +892,7 @@ img{max-width:100%;display:block}
 <!-- ═══ HEADER ═══ -->
 <header class="header" id="header">
   <button class="mobile-menu-btn" onclick="toggleMobileNav()"><i class="fas fa-bars"></i></button>
-    <a href="#" class="header-logo"><img src="logo.svg" alt="ElShamyGlow" style="height:50px;width:auto"></a>
+    <a href="#" class="header-logo"><img src="logo.svg" alt="ElShamyGlow" style="height:90px;width:auto"></a>
   <nav class="nav" id="nav">
     <a href="#home" class="nav-item active" data-page="home">Home</a>
     <a href="#shop" class="nav-item" data-page="shop">Shop</a>
