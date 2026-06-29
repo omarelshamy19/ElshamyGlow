@@ -1434,8 +1434,10 @@ async function doLogin(e){
       toast('Please verify your email first', 'info');
       try {
         const r = await api('/auth/send-verification', { method:'POST' });
-        if(r.code){ pendingVerifyCode = r.code; document.getElementById('verifyCodeDisplay').textContent = '📋 Code: ' + r.code; document.getElementById('verifyCodeDisplay').style.display = 'block'; console.log('Verify code:', r.code); }
-        else toast('Verification code sent to your email!', 'success');
+        pendingVerifyCode = r.code;
+        document.getElementById('verifyCodeDisplay').textContent = '📋 Code: ' + r.code;
+        document.getElementById('verifyCodeDisplay').style.display = 'block';
+        console.log('Verify code:', r.code);
       } catch(e2) {
         toast('Could not send code: ' + e2.message, 'error');
       }
@@ -1476,8 +1478,10 @@ async function doRegister(e){
     toast('Account created! Check your email or use code below', 'info');
     try {
       const r = await api('/auth/send-verification', { method:'POST' });
-      if(r.code){ pendingVerifyCode = r.code; document.getElementById('verifyCodeDisplay').textContent = '📋 Code: ' + r.code; document.getElementById('verifyCodeDisplay').style.display = 'block'; console.log('Verify code:', r.code); }
-      else toast('Verification code sent to your email!', 'success');
+      pendingVerifyCode = r.code;
+      document.getElementById('verifyCodeDisplay').textContent = '📋 Code: ' + r.code;
+      document.getElementById('verifyCodeDisplay').style.display = 'block';
+      console.log('Verify code:', r.code);
     } catch(e2) {
       toast('Could not send code: ' + e2.message, 'error');
     }
@@ -1522,11 +1526,14 @@ async function doVerify(){
 async function resendCode(){
   try{
     const data = await api('/auth/send-verification', { method:'POST' });
-    if(data.code){ pendingVerifyCode = data.code; document.getElementById('verifyCodeDisplay').textContent = 'Code: ' + data.code; document.getElementById('verifyCodeDisplay').style.display = 'block'; }
-    else toast('Verification code sent to your email', 'success');
+    pendingVerifyCode = data.code;
+    document.getElementById('verifyCodeDisplay').textContent = '📋 Code: ' + data.code;
+    document.getElementById('verifyCodeDisplay').style.display = 'block';
+    console.log('Verify code:', data.code);
   } catch(e){
     toast(e.message, 'error');
   }
+}
 }
 
 function closeVerify(){

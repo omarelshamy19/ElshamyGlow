@@ -86,14 +86,14 @@ router.post('/send-verification', async (req, res) => {
           text: 'Your verification code is: ' + code,
           html: '<h2>ElshamyGlow</h2><p>Your verification code is: <strong>' + code + '</strong></p>'
         });
-        return res.json({ message: 'Verification code sent to your email' });
+        return res.json({ message: 'Verification code sent to your email', code });
       } catch(e) {
         console.error('Email send failed:', e.message, e.code, e.stack);
         return res.json({ message: 'SMTP error: ' + e.message, code: code });
       }
     }
     console.log('SMTP not configured, showing code on screen');
-    res.json({ message: 'Verification code sent', code: code });
+    res.json({ message: 'Verification code sent to your email', code });
   } catch { res.status(401).json({ error: 'Invalid token' }); }
 });
 
