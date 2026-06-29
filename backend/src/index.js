@@ -19,7 +19,7 @@ app.use(helmet({
 
 // CORS - restrict to known origins
 const allowedOrigins = [
-  'https://adhamkhaled1510.github.io',
+  'https://omarelshamy19.github.io',
   'https://elshamyglow.vercel.app',
   'http://localhost:3000',
   'http://localhost:19006',
@@ -117,7 +117,7 @@ app.use(async (req, res, next) => {
       }
       const adminExists = await dbGet("SELECT id FROM users WHERE role = 'admin'");
       if (!adminExists) {
-        const adminEmail = process.env.ADMIN_EMAIL || 'admin@elshamyglow.com';
+        const adminEmail = process.env.ADMIN_EMAIL || 'omarelshamy1197@gmail.com';
         const adminPass = process.env.ADMIN_PASSWORD || 'admin123';
         const hashed = require('bcryptjs').hashSync(adminPass, 10);
         await dbRun("INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, 'admin')", ['Admin', adminEmail, hashed]);

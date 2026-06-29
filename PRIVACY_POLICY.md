@@ -23,7 +23,7 @@ Your data is stored securely on our servers. We use industry-standard security m
 We do not share your personal data with third parties except as necessary to process your orders (e.g., delivery services).
 
 ## Contact Us
-For any privacy-related questions, contact us at: elshamyglowapp@email.com
+For any privacy-related questions, contact us at: omarelshamy1197@gmail.com
 
 ## Changes to This Policy
 We may update this Privacy Policy from time to time. Changes will be posted on this page.

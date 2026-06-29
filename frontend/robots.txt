@@ -1,3 +1,3 @@
 User-agent: *
 Allow: /
-Sitemap: https://adhamkhaled1510.github.io/elshamyglow/sitemap.xml
+Sitemap: https://omarelshamy19.github.io/ElshamyGlow/sitemap.xml

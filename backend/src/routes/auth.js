@@ -131,7 +131,7 @@ router.get('/google/callback', async (req, res) => {
   const clientId = process.env.GOOGLE_CLIENT_ID;
   const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
   const redirectUri = process.env.GOOGLE_REDIRECT_URI || 'https://elshamyglow.vercel.app/api/auth/google/callback';
-  const frontendUrl = process.env.FRONTEND_URL || 'https://adhamkhaled1510.github.io/elshamyglow';
+  const frontendUrl = process.env.FRONTEND_URL || 'https://omarelshamy19.github.io/ElshamyGlow';
   let customRedirect = null;
   if (state) { try { const decoded = Buffer.from(state, 'base64').toString(); if (decoded.startsWith('http') || decoded.startsWith('elshamyglow://')) customRedirect = decoded; } catch {} }
   if (!code || !clientId || !clientSecret) return res.status(400).json({ error: 'Missing params' });
