@@ -1,5 +1,5 @@
-const TURSO_URL = process.env.TURSO_DB_URL || 'https://elshamyglow-db-adhamkhaled15.aws-us-east-2.turso.io';
-const TURSO_TOKEN = process.env.TURSO_AUTH_TOKEN || 'eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJhIjoicnciLCJpYXQiOjE3ODI2MjAxNDQsImlkIjoiMDE5ZjBjNzAtNGUwMS03ZDcwLWFjZDEtYmQ4N2FjYTY3OWFiIiwicmlkIjoiNGYyMzQ5MGItYTY5ZC00Mzc3LWE5YTAtNzVkMjhkZjY5ZDA5In0.60D30vyE42AA_XzuBpx7RQqVS_5n_v1YQbd_uOr3TF_esaCp5NPggUdWjJzF3SYAElRBBhgm-K1rTDAAslX5AA';
+const TURSO_URL = process.env.TURSO_DB_URL || 'https://elshamyglow-db-omarelshamy19.aws-eu-west-1.turso.io';
+const TURSO_TOKEN = process.env.TURSO_AUTH_TOKEN || 'eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE3ODI3MjQ3MTksImlkIjoiMDE5ZjEyYWMtNDIwMS03MzgwLWFhOWUtMjg0ZmE3YTIxZjExIiwia2lkIjoidmxqZ1ZyNUtFSHJSYkJKYm9CMGNsSnRBcXdRTFVFTUtCOXdST0NqdTJQYyIsInJpZCI6ImMyYzQwY2FjLWEyNzgtNDExMi1hNzQwLWM5ZWQ4N2Y1MDY1ZCJ9.-ZcS9jgtNycH5p6Z9rG9WG99y0nSi8InVAdvpuZcLhQDYU_Bz6m87tkkuRJvslu5mfSaIkzrq5enWImvHuPEDQ';
 
 let ready = false;
 
