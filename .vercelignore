@@ -1,4 +1,5 @@
-mobile/assets/*.apk
-desktop/dist
+mobile
+desktop
+frontend
 node_modules
 .git
