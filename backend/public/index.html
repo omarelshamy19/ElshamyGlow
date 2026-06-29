@@ -1068,8 +1068,7 @@ img{max-width:100%;display:block}
   <div class="modal" style="max-width:380px">
     <button class="modal-close" onclick="closeVerify()"><i class="fas fa-times"></i></button>
     <h2>Verify Your Email</h2>
-    <p>A verification code was sent to your email</p>
-    <div id="verifyCodeDisplay" style="display:none;background:#fff3cd;color:#856404;padding:8px 12px;border-radius:8px;margin-bottom:8px;font-size:18px;font-weight:700;text-align:center;letter-spacing:4px"></div>
+    <p>A verification code was sent to your email. Please check your inbox (and spam folder).</p>
     <div class="error" id="verifyError"></div>
     <div class="success" id="verifySuccess"></div>
     <div class="form-group">
@@ -1157,7 +1156,6 @@ let currentLang = 'en';
 let authToken = localStorage.getItem('elshamyglow_token') || '';
 let authUser = null;
 let pendingVerifyEmail = '';
-let pendingVerifyCode = '';
 let pendingLoginPass = '';
 let tempToken = '';
 
@@ -1428,16 +1426,12 @@ async function doLogin(e){
       document.getElementById('verifyCode').value = '';
       document.getElementById('verifyError').style.display = 'none';
       document.getElementById('verifySuccess').style.display = 'none';
-      document.getElementById('verifyCodeDisplay').style.display = 'none';
       document.getElementById('verifyModal').classList.add('open');
       document.body.classList.add('no-scroll');
       toast('Please verify your email first', 'info');
       try {
-        const r = await api('/auth/send-verification', { method:'POST' });
-        pendingVerifyCode = r.code;
-        document.getElementById('verifyCodeDisplay').textContent = '📋 Code: ' + r.code;
-        document.getElementById('verifyCodeDisplay').style.display = 'block';
-        console.log('Verify code:', r.code);
+        await api('/auth/send-verification', { method:'POST' });
+        toast('Verification code sent to your email!', 'success');
       } catch(e2) {
         toast('Could not send code: ' + e2.message, 'error');
       }
@@ -1472,16 +1466,12 @@ async function doRegister(e){
     document.getElementById('verifyCode').value = '';
     document.getElementById('verifyError').style.display = 'none';
     document.getElementById('verifySuccess').style.display = 'none';
-    document.getElementById('verifyCodeDisplay').style.display = 'none';
     document.getElementById('verifyModal').classList.add('open');
     document.body.classList.add('no-scroll');
-    toast('Account created! Check your email or use code below', 'info');
+    toast('Account created! Check your email for the verification code.', 'success');
     try {
-      const r = await api('/auth/send-verification', { method:'POST' });
-      pendingVerifyCode = r.code;
-      document.getElementById('verifyCodeDisplay').textContent = '📋 Code: ' + r.code;
-      document.getElementById('verifyCodeDisplay').style.display = 'block';
-      console.log('Verify code:', r.code);
+      await api('/auth/send-verification', { method:'POST' });
+      toast('Verification code sent to your email!', 'success');
     } catch(e2) {
       toast('Could not send code: ' + e2.message, 'error');
     }
@@ -1525,11 +1515,8 @@ async function doVerify(){
 
 async function resendCode(){
   try{
-    const data = await api('/auth/send-verification', { method:'POST' });
-    pendingVerifyCode = data.code;
-    document.getElementById('verifyCodeDisplay').textContent = '📋 Code: ' + data.code;
-    document.getElementById('verifyCodeDisplay').style.display = 'block';
-    console.log('Verify code:', data.code);
+    await api('/auth/send-verification', { method:'POST' });
+    toast('Verification code resent to your email!', 'success');
   } catch(e){
     toast(e.message, 'error');
   }
@@ -1538,7 +1525,6 @@ async function resendCode(){
 function closeVerify(){
   document.getElementById('verifyModal').classList.remove('open');
   document.body.classList.remove('no-scroll');
-  document.getElementById('verifyCodeDisplay').style.display = 'none';
 }
 
 async function loginWithKey(){
