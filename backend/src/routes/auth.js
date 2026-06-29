@@ -81,10 +81,11 @@ router.post('/send-verification', async (req, res) => {
           auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS }
         });
         await transporter.sendMail({
-          from: process.env.SMTP_FROM || process.env.SMTP_USER,
-          to: user.email, subject: 'ElshamyGlow - Verification Code',
-          text: 'Your verification code is: ' + code,
-          html: '<h2>ElshamyGlow</h2><p>Your verification code is: <strong>' + code + '</strong></p>'
+          from: `"ElShamyGlow" <${process.env.SMTP_FROM || process.env.SMTP_USER}>`,
+          to: user.email,
+          subject: '🔐 ElShamyGlow - Email Verification Code',
+          text: 'Welcome to ElShamyGlow!\n\nYour verification code is: ' + code + '\n\nThis code expires in 10 minutes.\n\nIf you did not create an account, please ignore this email.\n\nThank you,\nElShamyGlow Team',
+          html: `<!DOCTYPE html><html><head><meta charset="utf-8"><style>body{font-family:Arial,sans-serif;background:#f5f5f5;margin:0;padding:0}.container{max-width:480px;margin:30px auto;background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 2px 20px rgba(0,0,0,0.1)}.header{background:linear-gradient(135deg,#C2185B,#8E0040);color:#fff;text-align:center;padding:30px 20px}.header h1{margin:0;font-size:22px;font-weight:700}.header p{margin:5px 0 0;opacity:0.9;font-size:14px}.body{padding:30px 20px;text-align:center}.body p{color:#333;font-size:15px;line-height:1.6;margin:0 0 20px}.code{display:inline-block;background:#f8f4ff;border:2px dashed #C2185B;border-radius:12px;padding:12px 32px;font-size:32px;font-weight:800;letter-spacing:8px;color:#C2185B;margin:10px 0}.expires{color:#999;font-size:13px;margin-top:20px}.footer{background:#fafafa;padding:20px;text-align:center;color:#999;font-size:12px;border-top:1px solid #eee}.footer a{color:#C2185B;text-decoration:none}</style></head><body><div class="container"><div class="header"><h1>🔐 Email Verification</h1><p>ElShamyGlow</p></div><div class="body"><p>Welcome! Use the code below to verify your email address:</p><div class="code">${code}</div><p class="expires">⏱ This code expires in 10 minutes</p><p style="color:#666;font-size:13px;margin-top:24px">If you didn't create an account, you can safely ignore this email.</p></div><div class="footer"><p>ElShamyGlow — Egypt's trusted cosmetics store</p><p>Questions? Contact us at omarelshamy1197@gmail.com</p></div></div></body></html>`
         });
         return res.json({ message: 'Verification code sent to your email', code });
       } catch(e) {
