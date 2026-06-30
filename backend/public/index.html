@@ -904,6 +904,27 @@ img{max-width:100%;display:block}
 .dark .about-card p{color:#999}
 .dark .about-mission p{color:#999}
 
+/* ═══ SUPPORT PAGES ═══ */
+.support-page{max-width:800px;margin:0 auto;padding:60px 24px}
+.support-page h1{font-size:2rem;font-weight:900;margin-bottom:8px;letter-spacing:-1px}
+.support-page .sub{color:var(--text-muted);font-size:14px;margin-bottom:40px}
+.support-page .faq-item{border-bottom:1px solid var(--gray);padding:20px 0}
+.support-page .faq-item h3{font-weight:700;font-size:15px;margin-bottom:6px;cursor:pointer;display:flex;justify-content:space-between;align-items:center}
+.support-page .faq-item h3::after{content:'+';font-size:18px;color:var(--gold)}
+.support-page .faq-item.open h3::after{content:'−'}
+.support-page .faq-item p{font-size:13px;color:var(--text-muted);line-height:1.7;display:none;margin-top:8px}
+.support-page .faq-item.open p{display:block}
+.support-page .contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+.support-page .contact-card{background:var(--white);padding:32px 24px;text-align:center}
+.support-page .contact-card .icon{font-size:2rem;color:var(--gold);margin-bottom:12px}
+.support-page .contact-card h3{font-weight:800;font-size:15px;margin-bottom:6px}
+.support-page .contact-card p{font-size:13px;color:var(--text-muted)}
+.support-page .contact-card a{color:var(--gold);font-weight:700}
+.dark .support-page .faq-item{border-bottom-color:#333}
+.dark .support-page .faq-item p{color:#999}
+.dark .support-page .contact-card{background:#1A1A1A;border:1px solid #2A2A2A}
+.dark .support-page .contact-card p{color:#999}
+
 /* ═══ PRODUCT DETAIL ═══ */
 .product-detail{max-width:1000px;margin:0 auto;padding:30px 24px 60px}
 .pd-back{margin-bottom:20px}
@@ -1433,6 +1454,129 @@ img{max-width:100%;display:block}
   <a href="#" class="mb-nav-item" data-page="about"><i class="fas fa-user"></i><span>Account</span></a>
 </div>
 
+<!-- ═══ PAGE: FAQ ═══ -->
+<div class="page-section hidden" id="page-faq">
+  <div class="support-page">
+    <h1>Frequently Asked Questions</h1>
+    <p class="sub">Everything you need to know about shopping at ElShamyGlow</p>
+    <div class="faq-item">
+      <h3 onclick="this.parentElement.classList.toggle('open')">How do I place an order?</h3>
+      <p>Simply browse our products, add items to your cart, and proceed to checkout. Enter your shipping details and confirm your order. It's that easy!</p>
+    </div>
+    <div class="faq-item">
+      <h3 onclick="this.parentElement.classList.toggle('open')">What payment methods do you accept?</h3>
+      <p>We currently accept Cash on Delivery (COD) for all orders across Egypt. Pay when you receive your products — no upfront payment needed.</p>
+    </div>
+    <div class="faq-item">
+      <h3 onclick="this.parentElement.classList.toggle('open')">How long does delivery take?</h3>
+      <p>Delivery typically takes 2–5 business days within Egypt, depending on your location. Cairo and major cities usually receive orders within 2–3 days.</p>
+    </div>
+    <div class="faq-item">
+      <h3 onclick="this.parentElement.classList.toggle('open')">Do you offer free shipping?</h3>
+      <p>Yes! We offer free shipping on all orders over 500 EGP. Orders below 500 EGP have a small delivery fee.</p>
+    </div>
+    <div class="faq-item">
+      <h3 onclick="this.parentElement.classList.toggle('open')">Are your products authentic?</h3>
+      <p>Absolutely. We source directly from authorized distributors of L'Oréal, Maybelline, Nivea, and all other brands we carry. 100% authentic guaranteed.</p>
+    </div>
+    <div class="faq-item">
+      <h3 onclick="this.parentElement.classList.toggle('open')">Can I return or exchange a product?</h3>
+      <p>Yes, we accept returns within 7 days of delivery. Products must be unused and in original packaging. Contact us to initiate a return.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ PAGE: SHIPPING ═══ -->
+<div class="page-section hidden" id="page-shipping">
+  <div class="support-page">
+    <h1>Shipping Information</h1>
+    <p class="sub">Fast and reliable delivery across all of Egypt</p>
+    <div class="faq-item open">
+      <h3 onclick="this.parentElement.classList.toggle('open')">Delivery Time</h3>
+      <p style="display:block">Orders are processed within 24 hours. Delivery takes 2–5 business days depending on your location. Cairo and major cities: 2–3 days. Other regions: 3–5 days.</p>
+    </div>
+    <div class="faq-item open">
+      <h3 onclick="this.parentElement.classList.toggle('open')">Shipping Costs</h3>
+      <p style="display:block">Free shipping on orders over 500 EGP. Orders under 500 EGP have a flat delivery fee of 30 EGP.</p>
+    </div>
+    <div class="faq-item open">
+      <h3 onclick="this.parentElement.classList.toggle('open')">Coverage Area</h3>
+      <p style="display:block">We deliver to all governorates in Egypt: Cairo, Alexandria, Giza, Sharqia, Dakahlia, Gharbia, and all other regions.</p>
+    </div>
+    <div class="faq-item open">
+      <h3 onclick="this.parentElement.classList.toggle('open')">Order Tracking</h3>
+      <p style="display:block">Once your order is shipped, you'll receive a confirmation message with a tracking number. You can track your order on our Track Order page.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ PAGE: RETURNS ═══ -->
+<div class="page-section hidden" id="page-returns">
+  <div class="support-page">
+    <h1>Returns Policy</h1>
+    <p class="sub">Hassle-free returns within 7 days</p>
+    <div class="faq-item open">
+      <h3 onclick="this.parentElement.classList.toggle('open')">Return Period</h3>
+      <p style="display:block">You may return any product within 7 days of delivery. Products must be unused, unopened, and in their original packaging.</p>
+    </div>
+    <div class="faq-item open">
+      <h3 onclick="this.parentElement.classList.toggle('open')">How to Return</h3>
+      <p style="display:block">Contact us via our Contact page or WhatsApp. We'll guide you through the process and arrange for pickup if needed.</p>
+    </div>
+    <div class="faq-item open">
+      <h3 onclick="this.parentElement.classList.toggle('open')">Refunds</h3>
+      <p style="display:block">Refunds are processed within 5–7 business days after we receive the returned product. The amount will be refunded to your original payment method.</p>
+    </div>
+    <div class="faq-item open">
+      <h3 onclick="this.parentElement.classList.toggle('open')">Damaged or Wrong Items</h3>
+      <p style="display:block">If you receive a damaged or incorrect item, please contact us immediately. We'll replace it at no extra cost.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ PAGE: TRACK ORDER ═══ -->
+<div class="page-section hidden" id="page-track">
+  <div class="support-page">
+    <h1>Track Your Order</h1>
+    <p class="sub">Enter your order ID to check the status</p>
+    <div style="display:flex;gap:12px;max-width:450px">
+      <input type="text" id="trackInput" placeholder="Enter order ID (e.g. #1234)" style="flex:1;padding:14px 16px;border:1px solid var(--gray);font-family:inherit;font-size:14px;outline:none">
+      <button onclick="trackOrder()" class="btn btn-primary" style="padding:14px 28px;font-size:11px">Track</button>
+    </div>
+    <div id="trackResult" style="margin-top:24px;display:none;padding:20px;background:var(--gray);text-align:center;font-size:13px"></div>
+  </div>
+</div>
+
+<!-- ═══ PAGE: CONTACT ═══ -->
+<div class="page-section hidden" id="page-contact">
+  <div class="support-page">
+    <h1>Contact Us</h1>
+    <p class="sub">We're here to help! Reach out anytime.</p>
+    <div class="contact-grid">
+      <div class="contact-card">
+        <div class="icon"><i class="fab fa-whatsapp"></i></div>
+        <h3>WhatsApp</h3>
+        <p>Quickest way to reach us<br><a href="https://wa.me/201234567890">+20 123 456 7890</a></p>
+      </div>
+      <div class="contact-card">
+        <div class="icon"><i class="fas fa-envelope"></i></div>
+        <h3>Email</h3>
+        <p>For inquiries &amp; support<br><a href="mailto:omarelshamy1197@gmail.com">omarelshamy1197@gmail.com</a></p>
+      </div>
+      <div class="contact-card">
+        <div class="icon"><i class="fas fa-clock"></i></div>
+        <h3>Working Hours</h3>
+        <p>Sat–Thu: 10:00 AM – 10:00 PM<br>Friday: 2:00 PM – 10:00 PM</p>
+      </div>
+      <div class="contact-card">
+        <div class="icon"><i class="fas fa-map-marker-alt"></i></div>
+        <h3>Location</h3>
+        <p>Egypt — We deliver nationwide!</p>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- ═══ FOOTER ═══ -->
 <footer class="footer">
   <div class="footer-grid">
@@ -1464,11 +1608,11 @@ img{max-width:100%;display:block}
     </div>
     <div>
       <h3>Support</h3>
-      <a href="#">FAQ</a>
-      <a href="#">Shipping Info</a>
-      <a href="#">Returns Policy</a>
-      <a href="#">Track Order</a>
-      <a href="#">Contact</a>
+      <a href="#faq" onclick="navigate('faq')">FAQ</a>
+      <a href="#shipping" onclick="navigate('shipping')">Shipping Info</a>
+      <a href="#returns" onclick="navigate('returns')">Returns Policy</a>
+      <a href="#track" onclick="navigate('track')">Track Order</a>
+      <a href="#contact" onclick="navigate('contact')">Contact</a>
     </div>
   </div>
   <div class="footer-bottom">© 2026 ElShamyGlow. All rights reserved. | <a href="#" style="display:inline;color:inherit">Privacy Policy</a></div>
@@ -1666,6 +1810,23 @@ async function loadCategoryProducts(catId){
   } catch(e){
     grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--sale)">Failed to load products</div>';
   }
+}
+
+function trackOrder(){
+  const id = document.getElementById('trackInput')?.value.trim();
+  const result = document.getElementById('trackResult');
+  if(!id) { result.style.display='block'; result.innerHTML='Please enter an order ID'; return; }
+  fetch(API + '/orders/' + encodeURIComponent(id))
+    .then(r => r.json())
+    .then(data => {
+      result.style.display='block';
+      if(data.error) result.innerHTML='Order not found. Please check your ID and try again.';
+      else result.innerHTML='<strong>Order #' + id + '</strong><br>Status: <strong>' + (data.status||'Processing') + '</strong><br>' + (data.items ? data.items + ' item(s)' : '');
+    })
+    .catch(() => {
+      result.style.display='block';
+      result.innerHTML='<span style="color:var(--sale)">Could not fetch order. Please try again later.</span>';
+    });
 }
 
 function seedReviews(){
