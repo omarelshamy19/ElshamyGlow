@@ -142,7 +142,7 @@ img{max-width:100%;display:block}
   background:var(--white);
   border-bottom:1px solid #E8E8E8;
   padding:0 24px;
-  height:68px;
+  height:110px;
   display:flex;
   align-items:center;
   gap:24px;
@@ -150,7 +150,7 @@ img{max-width:100%;display:block}
 }
 .header.scrolled{box-shadow:0 4px 20px rgba(0,0,0,0.1)}
 .header-logo{display:flex;align-items:center;justify-content:center;flex:1}
-.header-logo img{height:50px;width:auto;display:block}
+.header-logo img{height:100px;width:auto;display:block}
 
 /* Nav */
 .nav{display:flex;gap:4px;align-items:center}
@@ -217,6 +217,15 @@ img{max-width:100%;display:block}
   justify-content:center;
 }
 .mobile-menu-btn{display:none;width:40px;height:40px;border:none;background:none;font-size:1.3rem;cursor:pointer;color:var(--text);flex-shrink:0}
+
+/* ═══ BRAND SLIDER ═══ */
+.brand-slider{padding:30px 24px;max-width:1200px;margin:0 auto;text-align:center}
+.brand-slider h3{font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--text-muted);margin-bottom:20px}
+.brand-track{display:flex;gap:40px;align-items:center;justify-content:center;flex-wrap:wrap}
+.brand-track img{height:30px;width:auto;opacity:0.4;filter:grayscale(1);transition:var(--transition)}
+.brand-track img:hover{opacity:1;filter:grayscale(0)}
+.dark .brand-track img{opacity:0.3}
+.dark .brand-track img:hover{opacity:0.8}
 
 /* ═══ HERO ═══ */
 .hero{
@@ -626,6 +635,15 @@ img{max-width:100%;display:block}
 .cart-drawer-footer .btn{width:100%;justify-content:center;padding:14px}
 .cart-empty{text-align:center;padding:40px 0;color:var(--text-muted);font-size:14px}
 
+/* ═══ CART SHIPPING ═══ */
+.cart-shipping{padding:12px 24px;border-top:1px solid var(--gray)}
+.cart-shipping-text{font-size:12px;color:var(--text);margin-bottom:6px}
+.cart-shipping-bar{height:6px;background:var(--gray);overflow:hidden}
+.cart-shipping-fill{height:100%;background:var(--gold);transition:width 0.3s ease}
+.dark .cart-shipping{border-top-color:#333}
+.dark .cart-shipping-text{color:#ccc}
+.dark .cart-shipping-bar{background:#333}
+
 /* ═══ MODALS ═══ */
 .modal-overlay{
   display:none;
@@ -852,6 +870,45 @@ img{max-width:100%;display:block}
 .wishlist-btn.active{color:var(--sale)}
 .wishlist-btn:hover{transform:scale(1.15)}
 
+/* ═══ ABOUT PAGE ═══ */
+.about-page{padding:60px 24px;max-width:900px;margin:0 auto}
+.about-hero{text-align:center;margin-bottom:50px}
+.about-hero h1{font-size:2rem;font-weight:900;margin-bottom:8px;letter-spacing:-1px}
+.about-hero p{color:var(--text-muted);font-size:15px}
+.about-content{display:grid;grid-template-columns:repeat(2,1fr);gap:24px;margin-bottom:50px}
+.about-card{background:var(--white);padding:32px 24px;text-align:center}
+.about-icon{font-size:2rem;color:var(--gold);margin-bottom:12px}
+.about-card h3{font-weight:800;font-size:16px;margin-bottom:8px}
+.about-card p{font-size:13px;color:var(--text-muted);line-height:1.7}
+.about-mission{text-align:center;max-width:700px;margin:0 auto;padding:40px 0}
+.about-mission h2{font-size:1.5rem;font-weight:800;margin-bottom:12px}
+.about-mission p{color:var(--text-muted);font-size:14px;line-height:1.8}
+.dark .about-card{background:#1A1A1A;border:1px solid #2A2A2A}
+.dark .about-card p{color:#999}
+.dark .about-mission p{color:#999}
+
+/* ═══ PRODUCT DETAIL ═══ */
+.product-detail{max-width:1000px;margin:0 auto;padding:30px 24px 60px}
+.pd-back{margin-bottom:20px}
+.pd-layout{display:grid;grid-template-columns:1fr 1fr;gap:50px}
+.pd-gallery .pd-main-img{width:100%;aspect-ratio:1;object-fit:cover;background:#F5F3F0;margin-bottom:12px}
+.pd-thumbs{display:flex;gap:8px}
+.pd-thumbs img{width:70px;height:70px;object-fit:cover;cursor:pointer;border:2px solid transparent;transition:var(--transition)}
+.pd-thumbs img.active,.pd-thumbs img:hover{border-color:var(--gold)}
+.pd-info .pd-brand{font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:4px}
+.pd-info .pd-title{font-size:clamp(1.2rem,2.5vw,1.6rem);font-weight:800;margin-bottom:8px;line-height:1.3}
+.pd-info .pd-rating{margin-bottom:12px}
+.pd-info .pd-price{margin-bottom:16px}
+.pd-info .pd-price .sale{font-size:24px;font-weight:800;color:var(--gold)}
+.pd-info .pd-price .orig{font-size:15px;color:var(--text-muted);text-decoration:line-through;margin-left:8px}
+.pd-info .pd-desc{font-size:14px;color:var(--text-muted);line-height:1.7;margin-bottom:16px}
+.pd-info .pd-stock{margin-bottom:16px;font-size:13px}
+.pd-info .qty-selector{margin-bottom:16px}
+.dark .pd-thumbs img.active,.dark .pd-thumbs img:hover{border-color:var(--gold-light)}
+.dark .pd-info .pd-desc{color:#999}
+.dark .pd-gallery .pd-main-img{background:#2A2A2A}
+.dark .product-detail .btn-outline{border-color:#333;color:#ccc}
+
 /* ═══ RESPONSIVE ═══ */
 @media(max-width:1024px){
   .nav{display:none}
@@ -877,8 +934,8 @@ img{max-width:100%;display:block}
 }
 @media(max-width:480px){
   .header{padding:0 12px}
-  .header{height:130px}
-  .header-logo img{height:100px}
+  .header{height:110px}
+  .header-logo img{height:90px}
   .hero h1{font-size:1.3rem}
   .trust-strip{grid-template-columns:1fr 1fr}
   .prod-card{min-width:155px;max-width:155px}
@@ -937,8 +994,9 @@ img{max-width:100%;display:block}
         <a href="#shop-cat-4" data-page="shop-cat-4">Face Serum</a>
       </div>
     </div>
+    <a href="#about" class="nav-item" data-page="about">About</a>
   </nav>
-  <a href="#" class="header-logo"><img src="logo.png" alt="ElShamyGlow" style="height:50px;width:auto"></a>
+  <a href="#" class="header-logo"><img src="logo.svg" alt="ElShamyGlow" style="height:100px;width:auto"></a>
   <div class="header-actions">
     <button class="header-btn" onclick="toggleSearch()"><i class="fas fa-search"></i></button>
     <button class="header-btn" id="darkToggle" onclick="toggleDark()"><i class="fas fa-moon"></i></button>
@@ -959,6 +1017,7 @@ img{max-width:100%;display:block}
   <a href="#" data-page="shop-cat-6" onclick="toggleMobileNav()">Hair Care</a>
   <a href="#" data-page="shop-cat-4" onclick="toggleMobileNav()">Skincare</a>
   <a href="#" data-page="shop-cat-7" onclick="toggleMobileNav()">Face Care</a>
+  <a href="#" data-page="about" onclick="toggleMobileNav()">About</a>
 </div>
 <div class="cart-overlay" id="cartOverlay" onclick="toggleCart()"></div>
 
@@ -981,6 +1040,20 @@ img{max-width:100%;display:block}
   <div class="trust-item"><span class="trust-icon">🚚</span><span class="trust-text">Fast Delivery Across Egypt</span></div>
   <div class="trust-item"><span class="trust-icon">💰</span><span class="trust-text">Lowest Price Guaranteed</span></div>
   <div class="trust-item"><span class="trust-icon">🔄</span><span class="trust-text">Easy Returns</span></div>
+</div>
+
+<!-- ═══ BRAND SLIDER ═══ -->
+<div class="brand-slider home-only">
+  <h3>Shop Top Brands</h3>
+  <div class="brand-track">
+    <img src="https://logo.clearbit.com/loreal.com" alt="L'Oréal">
+    <img src="https://logo.clearbit.com/maybelline.com" alt="Maybelline">
+    <img src="https://logo.clearbit.com/nivea.com" alt="Nivea">
+    <img src="https://logo.clearbit.com/garnier.com" alt="Garnier">
+    <img src="https://logo.clearbit.com/neutrogena.com" alt="Neutrogena">
+    <img src="https://logo.clearbit.com/nyxcosmetics.com" alt="NYX">
+    <img src="https://logo.clearbit.com/maccosmetics.com" alt="MAC">
+  </div>
 </div>
 
 <!-- ═══ PAGE: FLASH DEALS ═══ -->
@@ -1117,6 +1190,7 @@ img{max-width:100%;display:block}
   </div>
   <div class="cart-drawer-footer">
     <div class="cart-total"><span>Total</span><span id="cartTotal">0.00 EGP</span></div>
+    <div id="cartShippingProgress"></div>
     <button class="btn btn-primary" onclick="checkout()"><i class="fas fa-credit-card"></i> Checkout</button>
   </div>
 </div>
@@ -1250,6 +1324,70 @@ img{max-width:100%;display:block}
 <!-- ═══ TOAST ═══ -->
 <div class="toast-container" id="toastContainer"></div>
 
+<!-- ═══ PAGE: ABOUT ═══ -->
+<div class="page-section hidden" id="page-about">
+  <section class="about-page">
+    <div class="about-hero">
+      <h1>About ElShamyGlow</h1>
+      <p>Your trusted destination for authentic beauty products in Egypt</p>
+    </div>
+    <div class="about-content">
+      <div class="about-card">
+        <div class="about-icon"><i class="fas fa-medal"></i></div>
+        <h3>100% Authentic</h3>
+        <p>We source directly from authorized distributors of L'Oréal, Maybelline, Nivea, and more. Every product is guaranteed genuine.</p>
+      </div>
+      <div class="about-card">
+        <div class="about-icon"><i class="fas fa-truck"></i></div>
+        <h3>Fast Delivery</h3>
+        <p>Free shipping on orders over 500 EGP. We deliver across all of Egypt within 2-5 business days.</p>
+      </div>
+      <div class="about-card">
+        <div class="about-icon"><i class="fas fa-tags"></i></div>
+        <h3>Best Prices</h3>
+        <p>We offer unbeatable prices on top beauty brands. Price match guaranteed — find it cheaper and we'll match it.</p>
+      </div>
+      <div class="about-card">
+        <div class="about-icon"><i class="fas fa-credit-card"></i></div>
+        <h3>Cash on Delivery</h3>
+        <p>Pay when you receive. No hidden fees, no upfront payment — just safe and convenient shopping.</p>
+      </div>
+    </div>
+    <div class="about-mission">
+      <h2>Our Mission</h2>
+      <p>At ElShamyGlow, we believe everyone deserves access to premium beauty products without the premium price tag. Our mission is to bring you the world's most trusted beauty brands at prices that make you smile. From lipsticks to skincare, haircare to makeup — we curate only the best for you.</p>
+    </div>
+  </section>
+</div>
+
+<!-- ═══ PAGE: PRODUCT DETAIL ═══ -->
+<div class="page-section hidden" id="page-product">
+  <div class="product-detail" id="productDetail">
+    <div class="pd-back"><button onclick="history.back()" class="btn btn-outline" style="color:var(--text);border-color:var(--gray)"><i class="fas fa-arrow-left"></i> Back</button></div>
+    <div class="pd-layout">
+      <div class="pd-gallery">
+        <img class="pd-main-img" id="pdMainImg" src="" alt="">
+        <div class="pd-thumbs" id="pdThumbs"></div>
+      </div>
+      <div class="pd-info">
+        <div class="pd-brand" id="pdBrand"></div>
+        <h1 class="pd-title" id="pdTitle"></h1>
+        <div class="pd-rating"><i class="fas fa-star" style="color:var(--gold)"></i><i class="fas fa-star" style="color:var(--gold)"></i><i class="fas fa-star" style="color:var(--gold)"></i><i class="fas fa-star" style="color:var(--gold)"></i><i class="fas fa-star-half-alt" style="color:var(--gold)"></i><span style="font-size:13px;color:var(--text-muted);margin-left:8px">(12 reviews)</span></div>
+        <div class="pd-price" id="pdPrice"></div>
+        <p class="pd-desc" id="pdDesc"></p>
+        <div class="pd-stock" id="pdStock"></div>
+        <div class="qty-selector">
+          <button onclick="const i=this.nextElementSibling;i.value=Math.max(1,parseInt(i.value)-1)">−</button>
+          <input type="text" value="1" readonly>
+          <button onclick="const i=this.previousElementSibling;i.value=parseInt(i.value)+1">+</button>
+        </div>
+        <button class="btn btn-primary" id="pdAddToCart" style="width:100%;justify-content:center;padding:16px;font-size:13px"><i class="fas fa-shopping-bag"></i> Add to Cart</button>
+        <button class="btn btn-outline" id="pdWishlistBtn" style="width:100%;justify-content:center;padding:14px;margin-top:8px;border-color:var(--gray);color:var(--text);font-size:11px"><i class="far fa-heart"></i> Add to Wishlist</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- ═══ FOOTER ═══ -->
 <footer class="footer">
   <div class="footer-grid">
@@ -1329,7 +1467,7 @@ function renderProdCard(p){
   const isWished = wishlist.some(w => w.id === p.id);
   const wishIcon = isWished ? 'fas' : 'far';
   const stockHtml = (p.stock !== undefined && p.stock !== null && p.stock < 10) ? '<div class="stock-low">Only ' + p.stock + ' left!</div>' : '';
-  return `<div class="prod-card">
+  return `<div class="prod-card" onclick="openProductDetail({id:${safeId},name_en:'${safeName}',price:${price},images:'${(p.images||'').replace(/'/g,"\\'")}',brand:'${(p.brand||'').replace(/'/g,"\\'")}',description_en:'${(p.description_en||'').replace(/'/g,"\\'")}',stock:${p.stock !== undefined && p.stock !== null ? p.stock : 'null'}})">
     <div class="prod-img-wrap">${soldOutHtml}<button class="wishlist-btn ${wishIcon} fa-heart active" data-id="${p.id}" onclick="event.stopPropagation();toggleWishlist(${p.id},'${(p.name_en||'').replace(/'/g,"\\'")}',${p.price||0},'${img}')"></button><img src="${img}" alt="${name}" loading="lazy" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect fill=%22%23f0f0f0%22 width=%22100%22 height=%22100%22/><text x=%2250%22 y=%2255%22 text-anchor=%22middle%22 fill=%22%23999%22 font-size=%2230%22>📦</text></svg>'"></div>
     <div class="prod-info">
       <div class="prod-name">${name}</div>
@@ -1493,6 +1631,7 @@ async function init(){
       api('/products?tag=featured').then(d => d.products || []),
       api('/products').catch(() => ({ products: [], categories: [] })),
     ]);
+    allProducts = allData.products || [];
     renderScrollGrid(flashDeals, 'flashDealsGrid');
     renderScrollGrid(bridal, 'bridalGrid');
     renderScrollGrid(bundles, 'bundleGrid');
@@ -1549,6 +1688,8 @@ function saveCart(){
   renderCart();
 }
 
+const FREE_SHIPPING_THRESHOLD = 500;
+
 function loadCart(){
   try{ cart = JSON.parse(localStorage.getItem('elshamyglow_cart')) || []; }catch(e){ cart = []; }
   renderCart();
@@ -1561,11 +1702,19 @@ function renderCart(){
   const totalEl = document.getElementById('cartTotal');
   if(!container) return;
   const total = cart.reduce((s,c) => s + Number(c.price||0)*Number(c.qty||1), 0);
+  const remaining = Math.max(0, FREE_SHIPPING_THRESHOLD - total);
+  const progress = Math.min(100, (total / FREE_SHIPPING_THRESHOLD) * 100);
   const itemCount = cart.reduce((s,c) => s + Number(c.qty||1), 0);
   count.textContent = itemCount;
   badge.textContent = itemCount;
   badge.style.display = itemCount ? 'flex' : 'none';
   totalEl.textContent = Number(total).toLocaleString() + ' EGP';
+  const progressEl = document.getElementById('cartShippingProgress');
+  if(progressEl){
+    progressEl.innerHTML = remaining > 0
+      ? `<div class="cart-shipping"><div class="cart-shipping-text">Add <strong>${remaining.toLocaleString()} EGP</strong> more for free shipping!</div><div class="cart-shipping-bar"><div class="cart-shipping-fill" style="width:${progress}%"></div></div></div>`
+      : `<div class="cart-shipping"><div class="cart-shipping-text" style="color:green">Free shipping unlocked! 🎉</div><div class="cart-shipping-bar"><div class="cart-shipping-fill" style="width:100%;background:green"></div></div></div>`;
+  }
   if(!cart.length){
     container.innerHTML = '<div class="cart-empty">Your cart is empty</div>';
     return;
@@ -1939,6 +2088,57 @@ function updateWishlistIcons(){
     if(wishlist.some(w => w.id === id)) btn.classList.add('active');
     else btn.classList.remove('active');
   });
+}
+
+/* ═══ PRODUCT DETAIL PAGE ═══ */
+let allProducts = [];
+let currentProduct = null;
+
+function getProductById(id) {
+  return allProducts.find(p => p.id === id);
+}
+
+function openProductDetail(p) {
+  currentProduct = p;
+  if (!p) return;
+  const images = parseImages(p.images);
+  const img = images[0] || p.img || '';
+  const name = getProductName(p);
+  const price = Number(p.price || 0);
+  const brand = p.brand || '';
+  const desc = p.description_en || p.description_ar || '';
+
+  document.getElementById('pdMainImg').src = img;
+  document.getElementById('pdTitle').textContent = name;
+  document.getElementById('pdBrand').textContent = brand;
+  document.getElementById('pdDesc').textContent = desc;
+
+  const origPriceEl = document.getElementById('pdPrice');
+  origPriceEl.innerHTML = `<span class="sale">${price.toLocaleString()} EGP</span>`;
+
+  const stockEl = document.getElementById('pdStock');
+  if (p.stock !== undefined && p.stock !== null) {
+    if (p.stock <= 0) stockEl.innerHTML = '<span style="color:var(--sale);font-weight:700">Sold Out</span>';
+    else stockEl.innerHTML = p.stock < 10 ? '<span style="color:var(--sale);font-weight:600">Only ' + p.stock + ' left in stock!</span>' : '<span style="color:green;font-weight:600">In Stock</span>';
+  } else stockEl.innerHTML = '';
+
+  const thumbsEl = document.getElementById('pdThumbs');
+  thumbsEl.innerHTML = images.map((im, i) =>
+    `<img src="${im}" class="${i===0?'active':''}" onclick="document.getElementById('pdMainImg').src=this.src;this.parentElement.querySelectorAll('img').forEach(i=>i.classList.remove('active'));this.classList.add('active')">`
+  ).join('');
+
+  document.getElementById('pdAddToCart').onclick = function() {
+    const qty = parseInt(document.querySelector('.pd-info .qty-selector input').value) || 1;
+    addToCart({id:p.id, name, price, img, qty});
+  };
+
+  document.getElementById('pdWishlistBtn').onclick = function() {
+    toggleWishlist(p.id, p.name_en || name, price, img);
+    const isWished = wishlist.some(w => w.id === p.id);
+    this.innerHTML = isWished ? '<i class="fas fa-heart" style="color:var(--sale)"></i> Remove from Wishlist' : '<i class="far fa-heart"></i> Add to Wishlist';
+  };
+
+  navigate('product');
 }
 
 /* ═══ PAGE ROUTER ═══ */
