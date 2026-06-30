@@ -104,9 +104,12 @@ app.use(async (req, res, next) => {
   next();
 });
 
-// Seed check runs on every cold start (but only seeds if needed)
+// Seed check runs only on first ever cold start (never re-seeds after deletion)
 app.use(async (req, res, next) => {
   try {
+    const seeded = await dbGet("SELECT value FROM settings WHERE key = 'seeded'");
+    if (seeded) return next();
+
     const adminExists = await dbGet("SELECT id FROM users WHERE role = 'admin'");
     if (!adminExists) {
       const adminEmail = process.env.ADMIN_EMAIL || 'omarelshamy1197@gmail.com';
@@ -114,37 +117,26 @@ app.use(async (req, res, next) => {
       const hashed = require('bcryptjs').hashSync(adminPass, 10);
       await dbRun("INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, 'admin')", ['Admin', adminEmail, hashed]);
     }
+    await dbRun("INSERT OR IGNORE INTO settings (key, value) VALUES ('seeded', '1')");
+
     const catCount = await dbGet("SELECT COUNT(*) as c FROM categories");
     if (!catCount || catCount.c === 0) {
-      for (const c of categoriesData) await dbRun('INSERT INTO categories (name_ar, name_en) VALUES (?, ?)', c);
+      for (const c of categoriesData) await dbRun('INSERT INTO categories (name_ar, name_en, image) VALUES (?, ?, ?)', [c[0], c[1], null]);
     }
-    if (catCount && catCount.c > 0) {
-      // Check if brands need to be populated
-      const noBrand = await dbGet("SELECT COUNT(*) as c FROM products WHERE brand IS NULL OR brand = ''");
-      if (noBrand && noBrand.c > 0) {
-        const brandMap = {};
-        productsData.forEach(p => { if (p[1] && p[10]) brandMap[p[1]] = p[10]; });
-        for (const [name, brand] of Object.entries(brandMap)) {
-          await dbRun("UPDATE products SET brand = ? WHERE name_en = ? AND (brand IS NULL OR brand = '')", [brand, name]);
-        }
-      }
-      const prodCount = await dbGet("SELECT COUNT(*) as c FROM products");
-      if (!prodCount || prodCount.c === 0) {
-        // Seed products only if database is completely empty
-        // Never delete or overwrite existing products
-        const cats = await dbAll("SELECT id, name_en FROM categories");
-        const catMap = {};
-        const catNames = ['Lipstick', 'Eye Makeup', 'Foundation & Concealer', 'Skincare', 'Perfumes', 'Hair Care', 'Face Care'];
-        catNames.forEach((n, i) => {
-          const found = cats.find(c => c.name_en === n);
-          catMap[i + 1] = found ? found.id : null;
-        });
-        for (const p of productsData) {
-          const mappedP = [...p];
-          if (mappedP[6] && catMap[mappedP[6]]) mappedP[6] = catMap[mappedP[6]];
-          else mappedP[6] = null;
-          await dbRun('INSERT INTO products (name_ar, name_en, description_ar, description_en, price, stock, category_id, featured, images, tag, brand) VALUES (?,?,?,?,?,?,?,?,?,?,?)', mappedP);
-        }
+    const prodCount = await dbGet("SELECT COUNT(*) as c FROM products");
+    if (!prodCount || prodCount.c === 0) {
+      const cats = await dbAll("SELECT id, name_en FROM categories");
+      const catMap = {};
+      const catNames = ['Lipstick', 'Eye Makeup', 'Foundation & Concealer', 'Skincare', 'Perfumes', 'Hair Care', 'Face Care'];
+      catNames.forEach((n, i) => {
+        const found = cats.find(c => c.name_en === n);
+        catMap[i + 1] = found ? found.id : null;
+      });
+      for (const p of productsData) {
+        const mappedP = [...p];
+        if (mappedP[6] && catMap[mappedP[6]]) mappedP[6] = catMap[mappedP[6]];
+        else mappedP[6] = null;
+        await dbRun('INSERT INTO products (name_ar, name_en, description_ar, description_en, price, stock, category_id, featured, images, tag, brand) VALUES (?,?,?,?,?,?,?,?,?,?,?)', mappedP);
       }
     }
   } catch (e) {
