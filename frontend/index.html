@@ -781,6 +781,16 @@ img{max-width:100%;display:block}
 }
 .mobile-nav-overlay.open{display:block}
 
+/* ═══ MOBILE BOTTOM NAV ═══ */
+.mobile-bottom-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--white);border-top:1px solid #E8E8E8;z-index:999;padding:6px 0;justify-content:space-around}
+.mobile-bottom-nav .mb-nav-item{display:flex;flex-direction:column;align-items:center;gap:2px;padding:4px 10px;color:var(--text-muted);font-size:10px;font-weight:600;text-decoration:none;transition:var(--transition);cursor:pointer}
+.mobile-bottom-nav .mb-nav-item i{font-size:1.2rem}
+.mobile-bottom-nav .mb-nav-item.active{color:var(--gold)}
+.mobile-bottom-nav .mb-nav-item:hover{color:var(--gold)}
+.dark .mobile-bottom-nav{background:#1A1A1A;border-top-color:#2A2A2A}
+.dark .mobile-bottom-nav .mb-nav-item{color:#777}
+.dark .mobile-bottom-nav .mb-nav-item.active{color:var(--gold-light)}
+
 /* ═══ FOOTER ═══ */
 .footer{
   background:var(--black);
@@ -852,6 +862,13 @@ img{max-width:100%;display:block}
   .sidebar-inner.open{display:block}
 }
 
+/* ═══ COOKIE CONSENT ═══ */
+.cookie-banner{position:fixed;bottom:0;left:0;right:0;background:var(--black);color:#fff;padding:14px 24px;display:flex;align-items:center;justify-content:center;gap:20px;z-index:9999;font-size:13px;flex-wrap:wrap}
+.cookie-banner p{color:rgba(255,255,255,0.75)}
+.cookie-banner a{color:var(--gold-light);text-decoration:underline}
+.cookie-banner button{background:var(--gold);color:#fff;border:none;padding:8px 24px;font-weight:700;font-size:11px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:var(--transition);white-space:nowrap}
+.cookie-banner button:hover{background:var(--gold-light)}
+
 /* ═══ WHATSAPP FLOATING BUTTON ═══ */
 .whatsapp-btn{position:fixed;bottom:20px;right:20px;z-index:999;width:56px;height:56px;background:#25D366;color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:28px;box-shadow:0 4px 15px rgba(37,211,102,0.4);transition:var(--transition);animation:wppPulse 2s infinite}
 .whatsapp-btn:hover{transform:scale(1.1);box-shadow:0 6px 20px rgba(37,211,102,0.6)}
@@ -909,6 +926,20 @@ img{max-width:100%;display:block}
 .dark .pd-gallery .pd-main-img{background:#2A2A2A}
 .dark .product-detail .btn-outline{border-color:#333;color:#ccc}
 
+/* ═══ REVIEWS ═══ */
+.pd-reviews{margin-top:50px;padding-top:30px;border-top:1px solid var(--gray)}
+.pd-reviews h3{font-size:1.2rem;font-weight:800;margin-bottom:20px}
+.pd-review{display:flex;gap:12px;padding:16px 0;border-bottom:1px solid var(--gray)}
+.pd-review:last-child{border-bottom:none}
+.pd-review-avatar{width:40px;height:40px;background:var(--gray);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;color:var(--text);flex-shrink:0}
+.pd-review-content{flex:1}
+.pd-review-author{font-weight:700;font-size:13px;margin-bottom:2px}
+.pd-review-date{font-size:11px;color:var(--text-muted);margin-bottom:6px}
+.pd-review-text{font-size:13px;color:var(--text-muted);line-height:1.6}
+.dark .pd-reviews{border-top-color:#333}
+.dark .pd-review{border-bottom-color:#333}
+.dark .pd-review-avatar{background:#333}
+
 /* ═══ RESPONSIVE ═══ */
 @media(max-width:1024px){
   .nav{display:none}
@@ -931,6 +962,8 @@ img{max-width:100%;display:block}
   .prod-img-wrap{height:170px}
   .scroll-grid{gap:12px}
   .footer-grid{grid-template-columns:1fr}
+  .mobile-bottom-nav{display:flex}
+  body{padding-bottom:60px}
 }
 @media(max-width:480px){
   .header{padding:0 12px}
@@ -1386,6 +1419,18 @@ img{max-width:100%;display:block}
       </div>
     </div>
   </div>
+  <div class="pd-reviews">
+    <h3>Customer Reviews</h3>
+    <div class="pd-review-list" id="reviewList"></div>
+  </div>
+</div>
+
+<div class="mobile-bottom-nav" id="mobileBottomNav">
+  <a href="#" class="mb-nav-item active" data-page="home"><i class="fas fa-home"></i><span>Home</span></a>
+  <a href="#" class="mb-nav-item" data-page="shop"><i class="fas fa-search"></i><span>Search</span></a>
+  <a href="#" class="mb-nav-item" id="mbWishlist"><i class="fas fa-heart"></i><span>Wishlist</span></a>
+  <a href="#" class="mb-nav-item" onclick="toggleCart()"><i class="fas fa-shopping-bag"></i><span>Cart</span></a>
+  <a href="#" class="mb-nav-item" data-page="about"><i class="fas fa-user"></i><span>Account</span></a>
 </div>
 
 <!-- ═══ FOOTER ═══ -->
@@ -1622,8 +1667,29 @@ async function loadCategoryProducts(catId){
   }
 }
 
+function seedReviews(){
+  const seedData = {
+    1: [{author:'Sarah M.',date:'2026-05-15',text:'Amazing quality lipstick! Long lasting and the color is beautiful.'},{author:'Nour A.',date:'2026-05-20',text:'Perfect shade for daily wear. Love it!'}],
+    2: [{author:'Mona K.',date:'2026-05-10',text:'Very hydrating and gives a natural glow. Highly recommend.'},{author:'Dina H.',date:'2026-05-18',text:'Great blush! The tint lasts all day.'}],
+    3: [{author:'Laila R.',date:'2026-05-22',text:'Best foundation I have ever used. Matches my skin tone perfectly.'}],
+    4: [{author:'Yasmin T.',date:'2026-05-08',text:'Love the coconut scent! Makes my hair so soft.'}],
+    5: [{author:'Farah D.',date:'2026-05-12',text:'My go-to night cream. Skin feels amazing in the morning.'}],
+    6: [{author:'Heba M.',date:'2026-05-25',text:'Perfect for curly hair! Reduced frizz significantly.'}],
+    7: [{author:'Nadia S.',date:'2026-05-19',text:'Very gentle on my sensitive skin. No breakouts!'}]
+  };
+  Object.keys(seedData).forEach(id => {
+    const key = 'elshamyglow_reviews_' + id;
+    if (!localStorage.getItem(key)) {
+      localStorage.setItem(key, JSON.stringify(seedData[id]));
+    }
+  });
+}
+
 async function init(){
   try {
+    if(localStorage.getItem('elshamyglow_cookies') === 'accepted'){
+      document.getElementById('cookieBanner').style.display = 'none';
+    }
     const [flashDeals, bridal, bundles, featuredList, allData] = await Promise.all([
       api('/products?tag=flash_deal').then(d => d.products || []),
       api('/products?tag=bridal').then(d => d.products || []),
@@ -1632,6 +1698,7 @@ async function init(){
       api('/products').catch(() => ({ products: [], categories: [] })),
     ]);
     allProducts = allData.products || [];
+    seedReviews();
     renderScrollGrid(flashDeals, 'flashDealsGrid');
     renderScrollGrid(bridal, 'bridalGrid');
     renderScrollGrid(bundles, 'bundleGrid');
@@ -2138,6 +2205,23 @@ function openProductDetail(p) {
     this.innerHTML = isWished ? '<i class="fas fa-heart" style="color:var(--sale)"></i> Remove from Wishlist' : '<i class="far fa-heart"></i> Add to Wishlist';
   };
 
+  const reviews = JSON.parse(localStorage.getItem('elshamyglow_reviews_' + p.id) || '[]');
+  const reviewList = document.getElementById('reviewList');
+  if (reviews.length === 0) {
+    reviewList.innerHTML = '<p style="color:var(--text-muted);font-size:13px">No reviews yet. Be the first to review this product!</p>';
+  } else {
+    reviewList.innerHTML = reviews.map(r =>
+      `<div class="pd-review">
+        <div class="pd-review-avatar">${(r.author||'A')[0].toUpperCase()}</div>
+        <div class="pd-review-content">
+          <div class="pd-review-author">${r.author||'Anonymous'}</div>
+          <div class="pd-review-date">${r.date||''}</div>
+          <div class="pd-review-text">${r.text||''}</div>
+        </div>
+      </div>`
+    ).join('');
+  }
+
   navigate('product');
 }
 
@@ -2202,6 +2286,18 @@ window.addEventListener('scroll', () => {
   document.getElementById('header').classList.toggle('scrolled', window.scrollY > 50);
 });
 
+function acceptCookies(){
+  localStorage.setItem('elshamyglow_cookies', 'accepted');
+  document.getElementById('cookieBanner').style.display = 'none';
+}
+
+document.getElementById('mbWishlist')?.addEventListener('click', function(e){
+  e.preventDefault();
+  const items = wishlist.map(w => w.name).join('\n• ');
+  if(items) alert('Your wishlist:\n• ' + items);
+  else alert('Your wishlist is empty!');
+});
+
 if(localStorage.getItem('elshamyglow_dark') === '1'){
   document.body.classList.add('dark');
   document.querySelector('#darkToggle i').className = 'fas fa-sun';
@@ -2211,5 +2307,9 @@ init().then(function() {
 });
 </script>
 <a href="https://wa.me/201234567890?text=Hi%20ElShamyGlow!" target="_blank" rel="noopener" class="whatsapp-btn" aria-label="Chat on WhatsApp"><i class="fab fa-whatsapp"></i></a>
+<div class="cookie-banner" id="cookieBanner">
+  <p>We use cookies to improve your experience. By continuing, you agree to our <a href="#">Privacy Policy</a>.</p>
+  <button onclick="acceptCookies()">Accept</button>
+</div>
 </body>
 </html>
