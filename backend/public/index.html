@@ -1396,7 +1396,7 @@ img{max-width:100%;display:block}
 <!-- ═══ PAGE: PRODUCT DETAIL ═══ -->
 <div class="page-section hidden" id="page-product">
   <div class="product-detail" id="productDetail">
-    <div class="pd-back"><button onclick="navigate('home')" class="btn btn-outline" style="color:var(--text);border-color:var(--gray)"><i class="fas fa-arrow-left"></i> Back to Home</button></div>
+    <div class="pd-back"><button onclick="location.hash='#home'" class="btn btn-outline" style="color:var(--text);border-color:var(--gray)"><i class="fas fa-arrow-left"></i> Back to Home</button></div>
     <div class="pd-layout">
       <div class="pd-gallery">
         <img class="pd-main-img" id="pdMainImg" src="" alt="">
@@ -1512,7 +1512,7 @@ function renderProdCard(p){
   const isWished = wishlist.some(w => w.id === p.id);
   const wishIcon = isWished ? 'fas' : 'far';
   const stockHtml = (p.stock !== undefined && p.stock !== null && p.stock < 10) ? '<div class="stock-low">Only ' + p.stock + ' left!</div>' : '';
-  return `<div class="prod-card" onclick="openProductDetail(${safeId})">    <div class="prod-img-wrap">${soldOutHtml}<button class="wishlist-btn ${wishIcon} fa-heart active" data-id="${p.id}" onclick="event.stopPropagation();toggleWishlist(${p.id},'${(p.name_en||'').replace(/'/g,"\\'")}',${p.price||0},'${img}')"></button><img src="${img}" alt="${name}" loading="lazy" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect fill=%22%23f0f0f0%22 width=%22100%22 height=%22100%22/><text x=%2250%22 y=%2255%22 text-anchor=%22middle%22 fill=%22%23999%22 font-size=%2230%22>📦</text></svg>'"></div>
+  return `<div class="prod-card" onclick="location.hash='product-${safeId}'">    <div class="prod-img-wrap">${soldOutHtml}<button class="wishlist-btn ${wishIcon} fa-heart active" data-id="${p.id}" onclick="event.stopPropagation();toggleWishlist(${p.id},'${(p.name_en||'').replace(/'/g,"\\'")}',${p.price||0},'${img}')"></button><img src="${img}" alt="${name}" loading="lazy" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect fill=%22%23f0f0f0%22 width=%22100%22 height=%22100%22/><text x=%2250%22 y=%2255%22 text-anchor=%22middle%22 fill=%22%23999%22 font-size=%2230%22>📦</text></svg>'"></div>
     <div class="prod-info">
       <div class="prod-name">${name}</div>
       <div class="prod-price"><span class="sale">${price ? price.toLocaleString()+' EGP' : ''}</span></div>
@@ -2169,7 +2169,7 @@ function getProductById(id) {
 function openProductDetail(id) {
   let p = getProductById(id);
   if (!p) {
-    fetch(API + '/products/' + id).then(r => r.json()).then(d => { if (d) { allProducts.push(d); if(document.getElementById('page-product')) openProductDetail(d.id); } }).catch(() => {});
+    fetch(API + '/products/' + id).then(r => r.json()).then(d => { if (d) { allProducts.push(d); location.hash = 'product-' + d.id; } }).catch(() => {});
     return;
   }
   currentProduct = p;
@@ -2227,7 +2227,7 @@ function openProductDetail(id) {
     ).join('');
   }
 
-  navigate('product');
+  location.hash = 'product-' + id;
 }
 
 /* ═══ PAGE ROUTER ═══ */
@@ -2240,11 +2240,21 @@ function navigate(page) {
     document.getElementById('page-bundles')?.classList.remove('hidden');
     document.getElementById('page-shop')?.classList.add('hidden');
     document.getElementById('page-cat-results')?.classList.add('hidden');
+    document.getElementById('page-product')?.classList.add('hidden');
     document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
     document.querySelector('.nav-item[data-page="home"]')?.classList.add('active');
     return;
   }
   document.querySelectorAll('.page-section, .home-only').forEach(el => el.classList.add('hidden'));
+  // Handle product-{id} pages
+  if (page.startsWith('product-')) {
+    const id = parseInt(page.replace('product-', ''));
+    const target = document.getElementById('page-product');
+    if (target) { target.classList.remove('hidden'); }
+    openProductDetail(id);
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    return;
+  }
   // Handle legacy category filter pages (cat-{id})
   if (page.startsWith('cat-') && !page.startsWith('cat-results')) {
     const catId = page.replace('cat-', '');
