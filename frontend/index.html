@@ -1023,30 +1023,8 @@ img{max-width:100%;display:block}
       </div>
     </div>
     <div class="nav-item">
-      Beauty &amp; Makeup <i class="fas fa-chevron-down" style="font-size:10px;margin-left:4px"></i>
-      <div class="nav-dropdown">
-        <a href="#shop-cat-1" data-page="shop-cat-1">Lipstick</a>
-        <a href="#shop-cat-2" data-page="shop-cat-2">Creamy Tint &amp; Blusher</a>
-        <a href="#shop-cat-1" data-page="shop-cat-1">Lip Care</a>
-      </div>
-    </div>
-    <div class="nav-item">
-      Hair Care <i class="fas fa-chevron-down" style="font-size:10px;margin-left:4px"></i>
-      <div class="nav-dropdown">
-        <a href="#shop-cat-6" data-page="shop-cat-6">Shower Routine</a>
-        <a href="#shop-cat-6" data-page="shop-cat-6">Hair Oils</a>
-        <a href="#shop-cat-6" data-page="shop-cat-6">Hair Serum</a>
-        <a href="#shop-cat-6" data-page="shop-cat-6">Satin</a>
-        <a href="#shop-cat-6" data-page="shop-cat-6">Henna</a>
-      </div>
-    </div>
-    <div class="nav-item">
-      Skincare <i class="fas fa-chevron-down" style="font-size:10px;margin-left:4px"></i>
-      <div class="nav-dropdown">
-        <a href="#shop-cat-7" data-page="shop-cat-7">Face Soap</a>
-        <a href="#shop-cat-4" data-page="shop-cat-4">Night Cream</a>
-        <a href="#shop-cat-4" data-page="shop-cat-4">Face Serum</a>
-      </div>
+      Categories <i class="fas fa-chevron-down" style="font-size:10px;margin-left:4px"></i>
+      <div class="nav-dropdown" id="navCategories"></div>
     </div>
     <a href="#about" class="nav-item" data-page="about">About</a>
   </nav>
@@ -1066,11 +1044,7 @@ img{max-width:100%;display:block}
   <a href="#" data-page="home" onclick="toggleMobileNav()">Home</a>
   <a href="#" data-page="deals" onclick="toggleMobileNav()">New Arrivals</a>
   <a href="#" data-page="bundles" onclick="toggleMobileNav()">Bundles</a>
-  <a href="#" data-page="shop-cat-1" onclick="toggleMobileNav()">Lipstick</a>
-  <a href="#" data-page="shop-cat-2" onclick="toggleMobileNav()">Creamy Tint &amp; Blusher</a>
-  <a href="#" data-page="shop-cat-6" onclick="toggleMobileNav()">Hair Care</a>
-  <a href="#" data-page="shop-cat-4" onclick="toggleMobileNav()">Skincare</a>
-  <a href="#" data-page="shop-cat-7" onclick="toggleMobileNav()">Face Care</a>
+  <div id="mobileNavCategories"></div>
   <a href="#" data-page="about" onclick="toggleMobileNav()">About</a>
 </div>
 <div class="cart-overlay" id="cartOverlay" onclick="toggleCart()"></div>
@@ -1632,11 +1606,7 @@ img{max-width:100%;display:block}
     </div>
     <div>
       <h3>Categories</h3>
-      <a href="#shop-cat-1" onclick="navigate('shop-cat-1')">Lipstick</a>
-      <a href="#shop-cat-2" onclick="navigate('shop-cat-2')">Hair Care</a>
-      <a href="#shop-cat-3" onclick="navigate('shop-cat-3')">Skincare</a>
-      <a href="#shop-cat-4" onclick="navigate('shop-cat-4')">Bridal Bundles</a>
-      <a href="#shop-cat-7" onclick="navigate('shop-cat-7')">Beauty &amp; Makeup</a>
+      <div id="footerCategories"></div>
     </div>
     <div>
       <h3>Support</h3>
@@ -1735,6 +1705,34 @@ function renderFeatured(p){
       <button class="btn btn-primary" onclick='addFeaturedToCart()'><i class="fas fa-shopping-bag"></i> Add to Cart</button>
       <a href="#product-${p.id}" class="featured-details-link" onclick="event.preventDefault();location.hash='product-${p.id}'">View Full Details →</a>
     </div>`;
+}
+
+/* ═══ CATEGORY NAV ═══ */
+function esc(s){ return String(s).replace(/[&<>"']/g, function(m){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]; }); }
+function renderCategoryLinks(categories){
+  if(!categories) return;
+
+  const navEl = document.getElementById('navCategories');
+  if(navEl){
+    navEl.innerHTML = categories.map(c =>
+      `<a href="#shop-cat-${c.id}" data-page="shop-cat-${c.id}">${esc(c.name_en || c.name_ar)}</a>`
+    ).join('');
+  }
+
+  const mobileEl = document.getElementById('mobileNavCategories');
+  if(mobileEl){
+    mobileEl.innerHTML = '<div style="padding:6px 20px;font-size:12px;text-transform:uppercase;letter-spacing:1.5px;color:rgba(255,255,255,0.4);font-weight:600">Categories</div>' +
+      categories.map(c =>
+        `<a href="#" data-page="shop-cat-${c.id}" onclick="toggleMobileNav()">${esc(c.name_en || c.name_ar)}</a>`
+      ).join('');
+  }
+
+  const footerEl = document.getElementById('footerCategories');
+  if(footerEl){
+    footerEl.innerHTML = categories.map(c =>
+      `<a href="#shop-cat-${c.id}" onclick="navigate('shop-cat-${c.id}')">${esc(c.name_en || c.name_ar)}</a>`
+    ).join('');
+  }
 }
 
 /* ═══ SHOP FUNCTIONS ═══ */
@@ -1906,8 +1904,7 @@ async function init(){
       featuredProduct = allData.products[0];
     }
     renderFeatured(featuredProduct);
-
-
+    renderCategoryLinks(allData.categories);
 
     loadCart();
     updateWishlistIcons();
