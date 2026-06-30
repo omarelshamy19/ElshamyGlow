@@ -1851,7 +1851,8 @@ function seedReviews(){
 async function init(){
   try {
     if(localStorage.getItem('elshamyglow_cookies') === 'accepted'){
-      document.getElementById('cookieBanner').style.display = 'none';
+      const cb = document.getElementById('cookieBanner');
+      if(cb) cb.style.display = 'none';
     }
     const [flashDeals, bridal, bundles, featuredList, allData] = await Promise.all([
       api('/products?tag=flash_deal').then(d => d.products || []),
