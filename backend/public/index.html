@@ -1512,8 +1512,7 @@ function renderProdCard(p){
   const isWished = wishlist.some(w => w.id === p.id);
   const wishIcon = isWished ? 'fas' : 'far';
   const stockHtml = (p.stock !== undefined && p.stock !== null && p.stock < 10) ? '<div class="stock-low">Only ' + p.stock + ' left!</div>' : '';
-  return `<div class="prod-card" onclick="openProductDetail({id:${safeId},name_en:'${safeName}',price:${price},images:'${(p.images||'').replace(/'/g,"\\'")}',brand:'${(p.brand||'').replace(/'/g,"\\'")}',description_en:'${(p.description_en||'').replace(/'/g,"\\'")}',stock:${p.stock !== undefined && p.stock !== null ? p.stock : 'null'}})">
-    <div class="prod-img-wrap">${soldOutHtml}<button class="wishlist-btn ${wishIcon} fa-heart active" data-id="${p.id}" onclick="event.stopPropagation();toggleWishlist(${p.id},'${(p.name_en||'').replace(/'/g,"\\'")}',${p.price||0},'${img}')"></button><img src="${img}" alt="${name}" loading="lazy" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect fill=%22%23f0f0f0%22 width=%22100%22 height=%22100%22/><text x=%2250%22 y=%2255%22 text-anchor=%22middle%22 fill=%22%23999%22 font-size=%2230%22>📦</text></svg>'"></div>
+  return `<div class="prod-card" onclick="openProductDetail(${safeId})">    <div class="prod-img-wrap">${soldOutHtml}<button class="wishlist-btn ${wishIcon} fa-heart active" data-id="${p.id}" onclick="event.stopPropagation();toggleWishlist(${p.id},'${(p.name_en||'').replace(/'/g,"\\'")}',${p.price||0},'${img}')"></button><img src="${img}" alt="${name}" loading="lazy" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect fill=%22%23f0f0f0%22 width=%22100%22 height=%22100%22/><text x=%2250%22 y=%2255%22 text-anchor=%22middle%22 fill=%22%23999%22 font-size=%2230%22>📦</text></svg>'"></div>
     <div class="prod-info">
       <div class="prod-name">${name}</div>
       <div class="prod-price"><span class="sale">${price ? price.toLocaleString()+' EGP' : ''}</span></div>
@@ -1599,6 +1598,7 @@ async function loadShop(filters) {
       title.textContent = cat ? (cat.name_en || cat.name_ar) : 'Shop';
     } else title.textContent = 'All Products';
     if (total) {
+      products.forEach(p => { if(!allProducts.find(a => a.id === p.id)) allProducts.push(p); });
       grid.innerHTML = products.map(p => renderProdCard(p)).join('');
     } else {
       grid.innerHTML = '';
@@ -1657,6 +1657,7 @@ async function loadCategoryProducts(catId){
     const catName = (data.categories||[]).find(c => c.id == catId);
     title.textContent = (catName ? (catName.name_ar || catName.name_en) : 'Category');
     if(data.products && data.products.length){
+      data.products.forEach(p => { if(!allProducts.find(a => a.id === p.id)) allProducts.push(p); });
       grid.innerHTML = data.products.map(p => renderProdCard(p)).join('');
     } else {
       grid.innerHTML = '';
@@ -2165,9 +2166,13 @@ function getProductById(id) {
   return allProducts.find(p => p.id === id);
 }
 
-function openProductDetail(p) {
+function openProductDetail(id) {
+  let p = getProductById(id);
+  if (!p) {
+    fetch(API + '/products/' + id).then(r => r.json()).then(d => { if (d) { allProducts.push(d); if(document.getElementById('page-product')) openProductDetail(d.id); } }).catch(() => {});
+    return;
+  }
   currentProduct = p;
-  if (!p) return;
   const images = parseImages(p.images);
   const img = images[0] || p.img || '';
   const name = getProductName(p);
