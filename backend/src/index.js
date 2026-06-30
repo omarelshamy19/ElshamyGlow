@@ -128,9 +128,10 @@ app.use(async (req, res, next) => {
           await dbRun("UPDATE products SET brand = ? WHERE name_en = ? AND (brand IS NULL OR brand = '')", [brand, name]);
         }
       }
-      const prodWithTag = await dbGet("SELECT COUNT(*) as c FROM products WHERE tag IS NOT NULL AND tag != ''");
-      if (!prodWithTag || prodWithTag.c < 5) {
-        // Seed products with tags if there aren't enough tagged ones
+      const prodCount = await dbGet("SELECT COUNT(*) as c FROM products");
+      if (!prodCount || prodCount.c === 0) {
+        // Seed products only if database is completely empty
+        // Never delete or overwrite existing products
         const cats = await dbAll("SELECT id, name_en FROM categories");
         const catMap = {};
         const catNames = ['Lipstick', 'Eye Makeup', 'Foundation & Concealer', 'Skincare', 'Perfumes', 'Hair Care', 'Face Care'];
@@ -138,8 +139,6 @@ app.use(async (req, res, next) => {
           const found = cats.find(c => c.name_en === n);
           catMap[i + 1] = found ? found.id : null;
         });
-        // Delete untagged products
-        await dbRun("DELETE FROM products WHERE tag IS NULL OR tag = ''");
         for (const p of productsData) {
           const mappedP = [...p];
           if (mappedP[6] && catMap[mappedP[6]]) mappedP[6] = catMap[mappedP[6]];
