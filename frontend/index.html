@@ -1657,7 +1657,8 @@ function renderProdCard(p){
   const wishIcon = isWished ? 'fas' : 'far';
   const stockHtml = (p.stock !== undefined && p.stock !== null && p.stock < 10) ? '<div class="stock-low">Only ' + p.stock + ' left!</div>' : '';
   return `<div class="prod-card" onclick="location.hash='product-${safeId}'">    <div class="prod-img-wrap">${soldOutHtml}<button class="wishlist-btn ${wishIcon} fa-heart active" data-id="${p.id}" onclick="event.stopPropagation();toggleWishlist(${p.id},'${(p.name_en||'').replace(/'/g,"\\'")}',${p.price||0},'${img}')"></button><img src="${img}" alt="${name}" loading="lazy" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect fill=%22%23f0f0f0%22 width=%22100%22 height=%22100%22/><text x=%2250%22 y=%2255%22 text-anchor=%22middle%22 fill=%22%23999%22 font-size=%2230%22>📦</text></svg>'"></div>
-    <div class="prod-info">
+     <div class="prod-info">
+      <div class="prod-brand">${p.brand || ''}</div>
       <div class="prod-name">${name}</div>
       <div class="prod-price"><span class="sale">${price ? price.toLocaleString()+' EGP' : ''}</span></div>
       ${stockHtml}
