@@ -1577,6 +1577,38 @@ img{max-width:100%;display:block}
   </div>
 </div>
 
+<!-- ═══ PAGE: PRIVACY POLICY ═══ -->
+<div class="page-section hidden" id="page-privacy">
+  <section class="section" style="max-width:800px;margin:0 auto;padding:60px 20px">
+    <h1 style="font-size:32px;margin-bottom:8px">Privacy Policy</h1>
+    <p style="color:var(--text2);margin-bottom:32px">Last updated: June 30, 2026</p>
+
+    <h2 style="font-size:20px;margin-top:28px;margin-bottom:8px">1. Introduction</h2>
+    <p>Welcome to ElShamyGlow. We respect your privacy and are committed to protecting your personal data. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you visit our store.</p>
+
+    <h2 style="font-size:20px;margin-top:28px;margin-bottom:8px">2. Information We Collect</h2>
+    <p>We collect information you provide directly: name, email address, phone number, shipping address, and payment details (processed securely through third-party gateways). We also automatically collect: device information, browser type, IP address, and browsing behavior via cookies.</p>
+
+    <h2 style="font-size:20px;margin-top:28px;margin-bottom:8px">3. How We Use Your Information</h2>
+    <p>We use your data to process orders, deliver products, communicate with you about your orders, send promotional offers (with your consent), improve our store, and comply with legal obligations.</p>
+
+    <h2 style="font-size:20px;margin-top:28px;margin-bottom:8px">4. Cookies</h2>
+    <p>We use cookies to enhance your browsing experience, remember your preferences, and analyze site traffic. You can control cookie settings through your browser. By continuing to use our site, you consent to our use of cookies.</p>
+
+    <h2 style="font-size:20px;margin-top:28px;margin-bottom:8px">5. Data Sharing</h2>
+    <p>We do not sell your personal data. We may share information with trusted third parties who assist us in operating our store (payment processors, shipping carriers) under strict confidentiality agreements.</p>
+
+    <h2 style="font-size:20px;margin-top:28px;margin-bottom:8px">6. Data Security</h2>
+    <p>We implement industry-standard security measures to protect your personal information. However, no method of transmission over the Internet is 100% secure.</p>
+
+    <h2 style="font-size:20px;margin-top:28px;margin-bottom:8px">7. Your Rights</h2>
+    <p>You have the right to access, correct, or delete your personal data. You may also withdraw consent for marketing communications at any time by contacting us.</p>
+
+    <h2 style="font-size:20px;margin-top:28px;margin-bottom:8px">8. Contact</h2>
+    <p>For any privacy-related inquiries, please contact us at <a href="mailto:privacy@elshamyglow.com">privacy@elshamyglow.com</a> or via WhatsApp.</p>
+  </section>
+</div>
+
 <!-- ═══ FOOTER ═══ -->
 <footer class="footer">
   <div class="footer-grid">
@@ -1613,9 +1645,10 @@ img{max-width:100%;display:block}
       <a href="#returns" onclick="navigate('returns')">Returns Policy</a>
       <a href="#track" onclick="navigate('track')">Track Order</a>
       <a href="#contact" onclick="navigate('contact')">Contact</a>
+      <a href="#privacy" onclick="navigate('privacy')">Privacy Policy</a>
     </div>
   </div>
-  <div class="footer-bottom">© 2026 ElShamyGlow. All rights reserved. | <a href="#" style="display:inline;color:inherit">Privacy Policy</a></div>
+  <div class="footer-bottom">© 2026 ElShamyGlow. All rights reserved. | <a href="#privacy" onclick="navigate('privacy')" style="display:inline;color:inherit">Privacy Policy</a></div>
 </footer>
 
 <script>
@@ -2486,7 +2519,7 @@ init().then(function() {
 </script>
 <a href="https://wa.me/201234567890?text=Hi%20ElShamyGlow!" target="_blank" rel="noopener" class="whatsapp-btn" aria-label="Chat on WhatsApp"><i class="fab fa-whatsapp"></i></a>
 <div class="cookie-banner" id="cookieBanner">
-  <p>We use cookies to improve your experience. By continuing, you agree to our <a href="#">Privacy Policy</a>.</p>
+  <p>We use cookies to improve your experience. By continuing, you agree to our <a href="#privacy" onclick="navigate('privacy')">Privacy Policy</a>.</p>
   <button onclick="acceptCookies()">Accept</button>
 </div>
 </body>
