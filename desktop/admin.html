@@ -425,10 +425,23 @@ select.status-select{
           <div style="display:flex;gap:8px;flex-wrap:wrap">
             <button class="btn btn-primary btn-sm" onclick="openProductModal()">+ إضافة</button>
             <button class="btn btn-sm btn-outline" onclick="showImportModal()">📥 استيراد CSV</button>
+            <button class="btn btn-sm btn-outline" onclick="exportProducts()">📤 تصدير CSV</button>
+            <button class="btn btn-sm" style="background:var(--danger);color:#fff;border:none;padding:6px 14px;border-radius:var(--radius-sm);cursor:pointer;font-family:inherit;font-size:12px" onclick="bulkDelete()" id="bulkDeleteBtn">🗑️ حذف جماعي</button>
           </div>
         </div>
-        <div class="search-bar">
-          <input type="text" id="productSearch" placeholder="🔍 بحث..." oninput="loadProducts()">
+        <div class="search-bar" style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+          <input type="text" id="productSearch" placeholder="🔍 بحث..." oninput="loadProducts()" style="flex:1;min-width:120px">
+          <input type="number" id="filterMinPrice" placeholder="أقل سعر" oninput="loadProducts()" style="width:90px">
+          <input type="number" id="filterMaxPrice" placeholder="أعلى سعر" oninput="loadProducts()" style="width:90px">
+          <select id="filterCategory" onchange="loadProducts()" style="width:130px">
+            <option value="">كل الأقسام</option>
+          </select>
+          <select id="filterStock" onchange="loadProducts()" style="width:140px">
+            <option value="">كل المخزون</option>
+            <option value="low">منخفض (≤5)</option>
+            <option value="out">نفذ (0)</option>
+            <option value="in">متوفر</option>
+          </select>
         </div>
         <div id="productsTable"></div>
       </div>
@@ -527,6 +540,10 @@ select.status-select{
         <input type="file" id="pImageUpload" accept="image/*" onchange="uploadImage(event)" style="display:none">
       </div>
       <canvas id="pImagePreview" style="max-width:150px;max-height:150px;margin-top:8px;border-radius:8px;display:none"></canvas>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>تاريخ انتهاء الصلاحية</label><input type="date" id="pExpiryDate"></div>
+      <div class="form-group"><label>وزن/حجم</label><input id="pWeight" placeholder="مثال: 100ml, 50g"></div>
     </div>
     <div class="form-group"><label>المتغيرات (Variants) — JSON <span style="font-size:11px;color:var(--text2)">[{"type":"size","value":"30ml","stock":5,"price":80}]</span></label>
       <textarea id="pVariants" rows="3" style="font-family:monospace;font-size:12px" placeholder='[{"type":"size","value":"30ml","value_ar":"30مل","stock":10,"price":80},{"type":"color","value":"Red","value_ar":"أحمر","stock":5,"price":null}]'></textarea>
@@ -967,23 +984,50 @@ async function loadProducts() {
   try {
     const data = await api('/admin/products');
     const search = document.getElementById('productSearch').value.toLowerCase();
+    const minPrice = parseFloat(document.getElementById('filterMinPrice').value);
+    const maxPrice = parseFloat(document.getElementById('filterMaxPrice').value);
+    const catFilter = document.getElementById('filterCategory').value;
+    const stockFilter = document.getElementById('filterStock').value;
+
+    // Populate category filter dropdown
+    const catSelect = document.getElementById('filterCategory');
+    const currentVal = catSelect.value;
+    const allCats = await api('/products').then(d => d.categories || []).catch(() => []);
+    catSelect.innerHTML = '<option value="">كل الأقسام</option>' + allCats.map(c => `<option value="${c.id}">${c.name_ar} / ${c.name_en}</option>`).join('');
+    catSelect.value = currentVal;
+
     let products = data.products;
     if (search) products = products.filter(p => p.name_ar.includes(search) || p.name_en.toLowerCase().includes(search));
+    if (minPrice) products = products.filter(p => p.price >= minPrice);
+    if (maxPrice) products = products.filter(p => p.price <= maxPrice);
+    if (catFilter) products = products.filter(p => p.category_id == catFilter);
+    if (stockFilter === 'low') products = products.filter(p => p.stock <= 5);
+    else if (stockFilter === 'out') products = products.filter(p => p.stock <= 0);
+    else if (stockFilter === 'in') products = products.filter(p => p.stock > 0);
     if (lowStockFilter) products = products.filter(p => p.stock <= 5);
-    if (!products.length) { document.getElementById('productsTable').innerHTML = '<div class="empty-state"><div class="empty-icon">🛍️</div><p>' + t('لا توجد منتجات','No products') + '</p></div>'; return; }
+    if (!products.length) {
+      const totalCount = data.products.length;
+      document.getElementById('productsTable').innerHTML = '<div class="empty-state"><div class="empty-icon">🛍️</div><p>' + (totalCount === 0 ? t('لا توجد منتجات بعد','No products yet') : t('لا توجد نتائج للبحث','No results')) + '</p>' +
+        (totalCount === 0 ? '<button class="btn btn-primary btn-sm" onclick="openProductModal()" style="margin-top:12px">+ ' + t('إضافة أول منتج','Add First Product') + '</button>' : '') + '</div>';
+      return;
+    }
     document.getElementById('productsTable').innerHTML = `<div class="table-wrap"><table>
-      <tr><th>#</th><th>${t('الصورة','Image')}</th><th>${t('الاسم','Name')}</th><th>${t('SKU','SKU')}</th><th>${t('السعر','Price')}</th><th>${t('المخزون','Stock')}</th><th>${t('القسم','Category')}</th><th>${t('مميز','Featured')}</th><th>Tag</th><th></th></tr>
+      <tr><th><input type="checkbox" id="selectAllCheckbox" onchange="toggleSelectAll(this)"></th><th>#</th><th>${t('الصورة','Image')}</th><th>${t('الاسم','Name')}</th><th>${t('SKU','SKU')}</th><th>${t('السعر','Price')}</th><th>${t('المخزون','Stock')}</th><th>${t('الوزن','Weight')}</th><th>${t('صلاحية','Expiry')}</th><th>${t('القسم','Category')}</th><th>Tag</th><th></th></tr>
       ${products.map(p => {
         const imgs = (() => { try { return JSON.parse(p.images||'[]'); } catch { return []; } })();
         const skuDisplay = p.sku || '—';
+        const expiring = p.expiry_date ? new Date(p.expiry_date) < new Date(Date.now() + 30*24*60*60*1000) : false;
         return `<tr>
+        <td><input type="checkbox" class="product-checkbox" value="${p.id}"></td>
         <td>${p.id}</td>
-        <td>${imgs[0] ? `<img src="${esc(imgs[0])}" style="width:36px;height:36px;border-radius:8px;object-fit:cover" onerror="this.style.display='none'">` : '—'}</td>
-        <td>${esc(lang === 'ar' ? p.name_ar : p.name_en)}</td>
+        <td>${imgs[0] ? `<img src="${esc(imgs[0])}" style="width:40px;height:40px;border-radius:8px;object-fit:cover" onerror="this.style.display='none'">` : '—'}</td>
+        <td><strong>${esc(lang === 'ar' ? p.name_ar : p.name_en)}</strong></td>
         <td style="font-family:monospace;font-size:12px;color:var(--text2)">${esc(skuDisplay)}</td>
-        <td style="font-weight:600;color:var(--primary)">${Math.round(p.price)} EGP</td><td><span class="${p.stock <= 5 ? 'badge low-stock' : ''}">${p.stock} ${p.stock <= 5 ? '⚠️' : ''}</span></td>
+        <td style="font-weight:600;color:var(--primary)">${Math.round(p.price)} EGP</td>
+        <td><span class="${p.stock <= 5 ? 'badge low-stock' : ''}">${p.stock} ${p.stock <= 5 ? '⚠️' : ''}</span></td>
+        <td style="font-size:12px;color:var(--text2)">${p.weight || '—'}</td>
+        <td style="font-size:12px;color:${expiring ? 'var(--danger)' : 'var(--text2)'}">${p.expiry_date ? p.expiry_date + (expiring ? ' ⚠️' : '') : '—'}</td>
         <td>${esc(lang === 'ar' ? (p.category_ar||'—') : (p.category_en||'—'))}</td>
-        <td>${p.featured ? '⭐' : '—'}</td>
         <td style="font-size:11px;color:var(--text2)">${p.tag ? esc(p.tag) : '—'}</td>
         <td><button class="btn btn-sm btn-outline" onclick="openProductModal(${p.id})">✏️</button> <button class="btn btn-sm" style="background:var(--danger);color:#fff;padding:4px 10px;border:none;border-radius:6px;cursor:pointer;font-size:12px" onclick="deleteProduct(${p.id})">🗑️</button></td>
       </tr>`}).join('')}
@@ -994,7 +1038,7 @@ async function loadProducts() {
 async function openProductModal(id = null) {
   editingProductId = id;
   document.getElementById('productModalTitle').textContent = id ? t('تعديل المنتج','Edit Product') : t('إضافة منتج جديد','Add New Product');
-  ['pNameAr','pNameEn','pDescAr','pDescEn','pPrice','pStock','pImages','pSku','pVariants'].forEach(f => { const el = document.getElementById(f); if (el) el.value = ''; });
+  ['pNameAr','pNameEn','pDescAr','pDescEn','pPrice','pStock','pImages','pSku','pVariants','pExpiryDate','pWeight'].forEach(f => { const el = document.getElementById(f); if (el) el.value = ''; });
   document.getElementById('pFeatured').value = '0';
   document.getElementById('pTag').value = '';
   document.getElementById('pImagePreview').style.display = 'none';
@@ -1009,7 +1053,9 @@ async function openProductModal(id = null) {
         document.getElementById('pSku').value = p.sku||'';
         document.getElementById('pCategory').value = p.category_id; document.getElementById('pFeatured').value = p.featured; document.getElementById('pTag').value = p.tag || '';
         document.getElementById('pImages').value = (p.images ? (Array.isArray(p.images) ? p.images : JSON.parse(p.images||'[]')) : []).join('\n');
-        document.getElementById('pVariants').value = p.variants ? JSON.stringify(p.variants, null, 2) : '[]'; }
+        document.getElementById('pVariants').value = p.variants ? JSON.stringify(p.variants, null, 2) : '[]';
+        document.getElementById('pExpiryDate').value = p.expiry_date || '';
+        document.getElementById('pWeight').value = p.weight || ''; }
     } catch(e) { showToast(e.message, 'error'); }
   }
   document.getElementById('productModal').classList.add('show');
@@ -1069,6 +1115,8 @@ async function saveProduct() {
     category_id: parseInt(document.getElementById('pCategory').value), featured: parseInt(document.getElementById('pFeatured').value),
     tag: document.getElementById('pTag').value || '',
     sku: document.getElementById('pSku').value || null,
+    expiry_date: document.getElementById('pExpiryDate').value || null,
+    weight: document.getElementById('pWeight').value || null,
     images: document.getElementById('pImages').value.split('\n').filter(s=>s.trim()) };
   try {
     const variantsText = document.getElementById('pVariants').value;
@@ -1090,6 +1138,48 @@ async function deleteProduct(id) {
   if (!confirm(t('متأكد من الحذف؟','Delete?'))) return;
   try { await api('/admin/products/' + id, { method: 'DELETE' }); showToast(t('تم الحذف','Deleted')); loadProducts(); }
   catch(e) { showToast(e.message, 'error'); }
+}
+
+let selectedProducts = new Set();
+function toggleSelectAll(master) {
+  document.querySelectorAll('.product-checkbox').forEach(cb => cb.checked = master.checked);
+  updateSelected();
+}
+function updateSelected() {
+  selectedProducts = new Set([...document.querySelectorAll('.product-checkbox:checked')].map(cb => parseInt(cb.value)));
+}
+async function bulkDelete() {
+  const ids = [...document.querySelectorAll('.product-checkbox:checked')].map(cb => parseInt(cb.value));
+  if (!ids.length) return showToast(t('اختر منتجات أولاً','Select products first'), 'error');
+  if (!confirm(t(`حذف ${ids.length} منتج؟`,`Delete ${ids.length} products?`))) return;
+  let ok = 0, fail = 0;
+  for (const id of ids) {
+    try { await api('/admin/products/' + id, { method: 'DELETE' }); ok++; } catch(e) { fail++; }
+  }
+  showToast(t(`تم حذف ${ok} منتج${fail ? '، فشل ${fail}' : ''}`,`${ok} deleted${fail ? ', ${fail} failed' : ''}`));
+  loadProducts();
+}
+function exportProducts() {
+  const rows = [['ID','Name AR','Name EN','Price','Stock','SKU','Category','Tag','Weight','Expiry Date']];
+  document.querySelectorAll('.product-checkbox:checked').forEach(cb => {
+    const tr = cb.closest('tr');
+    const cells = tr.querySelectorAll('td');
+    const id = cells[1].textContent.trim();
+    const name = cells[3].textContent.trim();
+    const sku = cells[4].textContent.trim();
+    const price = cells[5].textContent.replace(' EGP','').trim();
+    const stock = cells[6].textContent.trim();
+    const weight = cells[7].textContent.trim();
+    const expiry = cells[8].textContent.trim();
+    const cat = cells[9].textContent.trim();
+    const tag = cells[10].textContent.trim();
+    rows.push([id, name, name, price, stock, sku, cat, tag, weight, expiry]);
+  });
+  if (rows.length === 1) return showToast(t('اختر منتجات للتصدير','Select products to export'), 'error');
+  const csv = rows.map(r => r.map(v => '"' + String(v).replace(/"/g,'""') + '"').join(',')).join('\n');
+  const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'products-export.csv'; a.click();
+  URL.revokeObjectURL(a.href);
 }
 
 // ─── USERS ───
