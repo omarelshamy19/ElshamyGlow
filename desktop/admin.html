@@ -373,8 +373,8 @@ select.status-select{
           <div id="recentOrders"></div>
         </div>
         <div class="card" id="topProducts">
-          <div style="font-weight:600;font-size:13px;margin-bottom:8px">🏆 ${t('الأكثر مبيعاً','Top Selling')}</div>
-          <div style="font-size:12px;color:var(--text2)">${t('لا توجد بيانات','No data yet')}</div>
+          <div style="font-weight:600;font-size:13px;margin-bottom:8px">🏆 الأكثر مبيعاً</div>
+          <div style="font-size:12px;color:var(--text2)">لا توجد بيانات</div>
         </div>
         <div class="card">
           <div class="card-header"><h3 id="dashQuickTitle">⚡ إجراءات سريعة</h3></div>
@@ -463,8 +463,8 @@ select.status-select{
     <div id="section-categories" class="hidden">
       <div class="card">
         <div class="card-header">
-          <h3>📂 ${t('الأقسام','Categories')}</h3>
-          <button class="btn btn-primary btn-sm" onclick="openCategoryModal()">+ ${t('إضافة','Add')}</button>
+          <h3>📂 الأقسام</h3>
+          <button class="btn btn-primary btn-sm" onclick="openCategoryModal()">+ إضافة</button>
         </div>
         <div id="categoriesTable"></div>
       </div>
@@ -582,22 +582,22 @@ select.status-select{
 <!-- CSV Import Modal -->
 <div class="modal-overlay" id="importModal">
   <div class="modal" style="max-width:600px">
-    <h3>📥 ${t('استيراد منتجات','Import Products')}</h3>
-    <p style="font-size:13px;color:var(--text2);margin-bottom:12px">${t('الصق بيانات CSV بالأعمدة التالية','Paste CSV data with columns')}: <code style="background:var(--bg);padding:2px 6px;border-radius:4px;font-size:12px">name_ar, name_en, price, stock, sku, description_ar, description_en, category_name_en, featured, tag</code></p>
-    <div class="form-group"><label>${t('بيانات CSV','CSV Data')}</label>
+    <h3>📥 استيراد منتجات</h3>
+    <p style="font-size:13px;color:var(--text2);margin-bottom:12px">الصق بيانات CSV بالأعمدة التالية: <code style="background:var(--bg);padding:2px 6px;border-radius:4px;font-size:12px">name_ar, name_en, price, stock, sku, description_ar, description_en, category_name_en, featured, tag</code></p>
+    <div class="form-group"><label>بيانات CSV</label>
       <textarea id="csvInput" rows="8" style="font-family:monospace;font-size:12px" placeholder="name_ar,name_en,price,stock,sku
 أحمر شفاه,Red Lipstick,120,50,GRX-LIP-001
 ماسكارا,Mascara,80,30,GRX-MAS-001"></textarea>
     </div>
     <div style="margin-bottom:12px">
       <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer">
-        <input type="checkbox" id="csvHasHeader" checked> ${t('السطر الأول هو عنوان الأعمدة','First row is header')}
+        <input type="checkbox" id="csvHasHeader" checked> السطر الأول هو عنوان الأعمدة
       </label>
     </div>
     <div id="importResult" style="display:none;margin-bottom:12px"></div>
     <div class="modal-actions">
-      <button class="btn btn-primary" onclick="importCSV()">📥 ${t('استيراد','Import')}</button>
-      <button class="btn btn-outline" onclick="closeModal('importModal')">${t('إلغاء','Cancel')}</button>
+      <button class="btn btn-primary" onclick="importCSV()">📥 استيراد</button>
+      <button class="btn btn-outline" onclick="closeModal('importModal')">إلغاء</button>
     </div>
   </div>
 </div>
@@ -605,15 +605,15 @@ select.status-select{
 <!-- Category Modal -->
 <div class="modal-overlay" id="categoryModal">
   <div class="modal">
-    <h3 id="categoryModalTitle">${t('إضافة قسم','Add Category')}</h3>
+    <h3 id="categoryModalTitle">إضافة قسم</h3>
     <div class="form-row">
-      <div class="form-group"><label>${t('الاسم (عربي)','Name (Arabic)')}</label><input id="catNameAr" placeholder="${t('عناية بالبشرة','Skincare')}"></div>
-      <div class="form-group"><label>${t('الاسم (English)','Name (English)')}</label><input id="catNameEn" placeholder="Skincare"></div>
+      <div class="form-group"><label>الاسم (عربي)</label><input id="catNameAr" placeholder="عناية بالبشرة"></div>
+      <div class="form-group"><label>الاسم (English)</label><input id="catNameEn" placeholder="Skincare"></div>
     </div>
-    <div class="form-group"><label>${t('رابط الصورة','Image URL')}</label><input id="catImage" placeholder="https://..."></div>
+    <div class="form-group"><label>رابط الصورة</label><input id="catImage" placeholder="https://..."></div>
     <div class="modal-actions">
-      <button class="btn btn-primary" onclick="saveCategory()">💾 ${t('حفظ','Save')}</button>
-      <button class="btn btn-outline" onclick="closeCategoryModal()">${t('إلغاء','Cancel')}</button>
+      <button class="btn btn-primary" onclick="saveCategory()">💾 حفظ</button>
+      <button class="btn btn-outline" onclick="closeCategoryModal()">إلغاء</button>
     </div>
   </div>
 </div>
